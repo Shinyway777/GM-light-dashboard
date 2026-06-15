@@ -437,6 +437,7 @@ body {
   transition: box-shadow .15s;
 }
 .cm-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.cm-card { cursor: pointer; }
 .cm-card-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
 .cm-acct { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; line-height: 1.3; }
 .cm-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
@@ -1917,26 +1918,94 @@ function renderVponGrid() {
 function openVponDeal(vk) {
   const d = _vponDealMap[vk];
   if (!d) { console.warn('vpon deal not found:', vk); return; }
-  openDealPanel(d);  // call openDealPanel directly — no need for registerDeal
-  // Auto-add to account DB if absent
-  if (d.name && d._vpon) {
-    const exists = Object.keys(_accountDB).find(k =>
-      k.toLowerCase() === d.name.toLowerCase() ||
-      d.name.toLowerCase().includes(k.toLowerCase()) ||
-      k.toLowerCase().includes(d.name.toLowerCase())
-    );
-    if (!exists) {
-      _accountDB[d.name] = {
-        bio: {
-          zh: '[' + (d._vpon._bu||'') + ' 市場] CRM: ' + d._vpon.crm_stage + ' | ' + d._vpon.currency + ' | Vpon pipeline 自動新增',
-          en: '[' + (d._vpon._bu||'') + ' Market] CRM: ' + d._vpon.crm_stage + ' | ' + d._vpon.currency + ' | Auto-added from Vpon pipeline'
-        },
-        industry: '',
-        country: d._vpon._bu || ''
+
+  // Try to find matching company in clients.json via CM_CLIENTS
+  // Match opp name against client names: strip prefix, normalize, fuzzy match
+  const oppRaw = d._vpon ? d._vpon.opp : d.name;
+  const oppClean = oppRaw.replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ').toLowerCase();
+  
+  // Look up in CM_CLIENTS for rich profile
+  let matchedClient = null;
+  if (CM_CLIENTS && CM_CLIENTS.length) {
+    // Exact or partial match
+    matchedClient = CM_CLIENTS.find(c => {
+      const cn = c.name.toLowerCase();
+      // Try various match strategies
+      return oppClean.includes(cn) || cn.split(/[\s(]/)[0].length > 3 && oppClean.includes(cn.split(/[\s(]/)[0].toLowerCase());
+    });
+    // If not found, try matching first meaningful word of opp against client names
+    if (!matchedClient) {
+      const oppWords = oppClean.split(/[\s_\-]+/).filter(w => w.length > 3);
+      matchedClient = CM_CLIENTS.find(c => {
+        const cn = c.name.toLowerCase();
+        return oppWords.some(w => cn.includes(w) && w.length > 4);
+      });
+    }
+  }
+
+  // Build enriched deal object with client profile
+  const enriched = Object.assign({}, d);
+  if (matchedClient) {
+    enriched.account = matchedClient.name;
+    // Add profile as note if no bio in accountDB
+    if (!enriched.note) enriched.note = matchedClient.profile || '';
+    // Store in accountDB so openDealPanel can find the bio
+    if (!_accountDB[matchedClient.name]) {
+      _accountDB[matchedClient.name] = {
+        bio: { zh: matchedClient.profile || '', en: matchedClient.profile || '' },
+        industry: matchedClient.svc || '',
+        country: matchedClient.mkt || ''
       };
       try { localStorage.setItem('tagtoo_gm_accounts_v1', JSON.stringify(_accountDB)); updateAcctBadge(); } catch(e) {}
     }
   }
+
+  openDealPanel(enriched);
+
+  // Auto-add to accountDB if still not present (for deals not in CM_CLIENTS)
+  const lookupName = matchedClient ? matchedClient.name : d.name;
+  if (lookupName && !_accountDB[lookupName] && d._vpon) {
+    _accountDB[lookupName] = {
+      bio: {
+        zh: '[' + (d._vpon._bu||'') + ' 市場] CRM: ' + d._vpon.crm_stage + ' | ' + d._vpon.currency + ' | Vpon pipeline 自動新增',
+        en: '[' + (d._vpon._bu||'') + ' Market] CRM: ' + d._vpon.crm_stage + ' | ' + d._vpon.currency + ' | Auto-added from Vpon pipeline'
+      },
+      industry: '', country: d._vpon._bu || ''
+    };
+    try { localStorage.setItem('tagtoo_gm_accounts_v1', JSON.stringify(_accountDB)); updateAcctBadge(); } catch(e) {}
+  }
+}
+
+function openCMCard(el) {
+  // Find the client data from CM_CLIENTS by name
+  const nameEl = el.querySelector('.cm-acct');
+  if (!nameEl) return;
+  const name = nameEl.textContent.trim();
+  const c = CM_CLIENTS.find(x => x.name === name);
+  if (!c) return;
+
+  // Build a deal-panel compatible object
+  const d = {
+    name: c.name,
+    stage: c.stage,
+    amount: (c.crm && c.crm !== '—' ? 'CRM ' + c.crm : '') + (c.gcm && c.gcm !== '—' ? '  |  GCM ' + c.gcm : ''),
+    close_date: c.start + ' → ' + c.end,
+    owner: c.owner || '—',
+    account: c.name,
+    note: c.note || '',
+    history: c.months && c.months !== '—' ? [{date: '活躍月份', desc: c.months}] : []
+  };
+
+  // Make sure accountDB has the profile for this client
+  if (!_accountDB[c.name] && c.profile) {
+    _accountDB[c.name] = {
+      bio: { zh: c.profile, en: c.profile },
+      industry: c.svc || '',
+      country: c.mkt || ''
+    };
+  }
+
+  openDealPanel(d);
 }
 
 function buildClientMaster() {
@@ -1952,7 +2021,7 @@ function buildClientMaster() {
     byMkt[mkt].forEach(c => {
       const sc = cmStageColor(c.stage);
       const bg = cmBgColor(c.stage, !!c.ar);
-      html += `<div class="cm-card" style="background:${bg};border-left:4px solid ${sc};" data-mkt="${c.mkt}" data-stage="${c.stage}" data-ar="${c.ar||''}">
+      html += `<div class="cm-card" style="background:${bg};border-left:4px solid ${sc};cursor:pointer;" data-mkt="${c.mkt}" data-stage="${c.stage}" data-ar="${c.ar||''}" onclick="openCMCard(this)">
   <div class="cm-card-hd">
     <div class="cm-acct">${c.name}</div>
     <div class="cm-badges">
