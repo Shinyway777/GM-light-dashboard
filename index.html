@@ -1915,41 +1915,50 @@ function renderVponGrid() {
   el.innerHTML = h;
 }
 
+/* Tokenize opp name: split camelCase, strip dates/noise */
+function _vponTokenizeOpp(s) {
+  s = s.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+  s = s.replace(/\d+(?:march|april|may|june|july|aug|sep|oct|nov|dec|jan|feb)\w*/gi, '');
+  s = s.replace(/'?\d{2,4}/g, '');
+  const noise = new Set(['kol','koc','xhs','ads','meta','tiktok','google','cpas','smm','app',
+    'install','live','shop','h1','h2','q1','q2','q3','q4','ad','management',
+    'jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec',
+    'march','april','june','july','august','january','february',
+    'via','and','the','my','id','th','in','agency','last','minute']);
+  return new Set((s.match(/[a-zA-Z0-9\u4e00-\u9fff]+/g)||[])
+    .map(t=>t.toLowerCase()).filter(t=>t.length>1&&!noise.has(t)));
+}
+/* Tokenize client name: keep all words including parenthetical (acronyms/aliases matter) */
+function _vponTokenizeClient(s) {
+  s = s.replace(/[/\\&()\[\]]/g, ' ');
+  const noise = new Set(['via','and','the','sdn','bhd','pt','co','ltd','inc','pte','pty','by','or']);
+  return new Set((s.match(/[a-zA-Z0-9\u4e00-\u9fff]+/g)||[])
+    .map(t=>t.toLowerCase()).filter(t=>t.length>1&&!noise.has(t)));
+}
+
+function _vponFindClient(oppName) {
+  if (!CM_CLIENTS || !CM_CLIENTS.length) return null;
+  const oppT = _vponTokenizeOpp(oppName);
+  let best = null, bestScore = 0;
+  for (const c of CM_CLIENTS) {
+    const clientT = _vponTokenizeClient(c.name);
+    let overlap = 0;
+    for (const t of oppT) { if (clientT.has(t)) overlap++; }
+    const score = overlap / Math.max(clientT.size, 1);
+    if (score > bestScore) { bestScore = score; best = c; }
+  }
+  return bestScore > 0 ? best : null;
+}
+
 function openVponDeal(vk) {
   const d = _vponDealMap[vk];
   if (!d) { console.warn('vpon deal not found:', vk); return; }
 
-  // Try to find matching company in clients.json via CM_CLIENTS
-  // Match opp name against client names: strip prefix, normalize, fuzzy match
   const oppRaw = d._vpon ? d._vpon.opp : d.name;
-  const oppClean = oppRaw.replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ').toLowerCase();
-  
-  // Look up in CM_CLIENTS for rich profile
-  let matchedClient = null;
-  if (CM_CLIENTS && CM_CLIENTS.length) {
-    // Exact or partial match
-    matchedClient = CM_CLIENTS.find(c => {
-      const cn = c.name.toLowerCase();
-      // Try various match strategies
-      return oppClean.includes(cn) || cn.split(/[\s(]/)[0].length > 3 && oppClean.includes(cn.split(/[\s(]/)[0].toLowerCase());
-    });
-    // If not found, try matching first meaningful word of opp against client names
-    if (!matchedClient) {
-      const oppWords = oppClean.split(/[\s_\-]+/).filter(w => w.length > 3);
-      matchedClient = CM_CLIENTS.find(c => {
-        const cn = c.name.toLowerCase();
-        return oppWords.some(w => cn.includes(w) && w.length > 4);
-      });
-    }
-  }
+  const matchedClient = _vponFindClient(oppRaw);
 
-  // Build enriched deal object with client profile
-  const enriched = Object.assign({}, d);
+  // Ensure client profile is in _accountDB so openDealPanel can show bio
   if (matchedClient) {
-    enriched.account = matchedClient.name;
-    // Add profile as note if no bio in accountDB
-    if (!enriched.note) enriched.note = matchedClient.profile || '';
-    // Store in accountDB so openDealPanel can find the bio
     if (!_accountDB[matchedClient.name]) {
       _accountDB[matchedClient.name] = {
         bio: { zh: matchedClient.profile || '', en: matchedClient.profile || '' },
@@ -1960,9 +1969,18 @@ function openVponDeal(vk) {
     }
   }
 
+  // Build enriched deal with matched client info
+  const enriched = Object.assign({}, d);
+  if (matchedClient) {
+    enriched.account  = matchedClient.name;
+    enriched.owner    = enriched.owner || matchedClient.owner || '—';
+    enriched.industry = matchedClient.svc || '';
+    if (!enriched.note) enriched.note = 'Vpon Stage: ' + (d._vpon ? d._vpon.crm_stage : '') ;
+  }
+
   openDealPanel(enriched);
 
-  // Auto-add to accountDB if still not present (for deals not in CM_CLIENTS)
+  // Auto-add unknown deals to accountDB
   const lookupName = matchedClient ? matchedClient.name : d.name;
   if (lookupName && !_accountDB[lookupName] && d._vpon) {
     _accountDB[lookupName] = {
