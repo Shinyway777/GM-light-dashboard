@@ -1548,6 +1548,7 @@ function renderKPI(kpi, week) {
       <div class="kpi-lbl">INDONESIA — KPI</div>
       <div class="kpi-val ${rate(kpi.id_rate)}">${kpi.id_rate||'—'}</div>
       <div class="kpi-sub">${sub(kpi.id_vs, kpi.id_dim||'')}</div>
+      ${kpi.id_margin_rate ? `<div class="kpi-sub" style="font-size:10px;margin-top:2px;">Margin ${kpi.id_margin_rate} · ${kpi.id_margin_vs||''}</div>` : ''}
     </div>
     <div class="kpi-card">
       <div class="kpi-lbl">THAILAND — KPI</div>
