@@ -382,6 +382,81 @@ body {
   .topbar, .main { padding-left: 16px; padding-right: 16px; }
   .paste-panel { margin-left: 16px; margin-right: 16px; }
 }
+
+/* ── TAB NAV ── */
+.tab-nav {
+  background: var(--bg2); border-bottom: 1px solid var(--border2);
+  padding: 0 28px; display: flex; gap: 0; position: sticky; top: 52px; z-index: 99;
+}
+.tab-btn {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: var(--text3); padding: 10px 18px; cursor: pointer;
+  transition: all .15s; font-weight: 500;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── CLIENT MASTER ── */
+#client-master { display: none; padding: 0 28px 60px; }
+.cm-controls {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 10px; padding: 14px 16px; margin: 16px 0 10px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.cm-search {
+  width: 100%; padding: 9px 14px;
+  border: 1px solid var(--border2); border-radius: 7px;
+  font-family: var(--sans); font-size: 13px; color: var(--text);
+  background: var(--bg3); outline: none; transition: border-color .15s;
+}
+.cm-search:focus { border-color: var(--accent); }
+.cm-filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.cm-fb {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border2); background: var(--bg2);
+  font-family: var(--mono); font-size: 11px; cursor: pointer;
+  color: var(--text2); transition: all .15s; font-weight: 500;
+}
+.cm-fb:hover { border-color: var(--accent); color: var(--accent); }
+.cm-fb.active  { background: var(--text); color: var(--bg); border-color: var(--text); }
+.cm-fb.my.active  { background: #1B5E20; border-color: #1B5E20; color:#fff; }
+.cm-fb.id.active  { background: #7B3F00; border-color: #7B3F00; color:#fff; }
+.cm-fb.th.active  { background: #1A237E; border-color: #1A237E; color:#fff; }
+.cm-fb.won.active { background: var(--green); border-color: var(--green); color:#fff; }
+.cm-fb.pipe.active{ background: var(--amber); border-color: var(--amber); color:#fff; }
+.cm-fb.ar.active  { background: var(--red); border-color: var(--red); color:#fff; }
+.cm-stats { font-family: var(--mono); font-size: 11px; color: var(--text3); margin: 0 0 4px; }
+.cm-mkt-hdr {
+  color: #fff; font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .07em; padding: 7px 14px; border-radius: 7px; margin: 16px 0 8px;
+}
+.cm-card {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 10px; margin-bottom: 10px; padding: 14px 16px;
+  transition: box-shadow .15s;
+}
+.cm-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.cm-card-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.cm-acct { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; line-height: 1.3; }
+.cm-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
+.cm-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-family: var(--mono); font-size: 10px; font-weight: 600; white-space: nowrap; color: #fff; }
+.cm-badge.warn { background: var(--red); }
+.cm-badge.prob { background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border2); }
+.cm-profile {
+  font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 10px;
+  padding: 10px 12px; background: var(--bg3); border-radius: 7px;
+  border: 0.5px solid var(--border);
+}
+.cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.cm-item { background: var(--bg3); border-radius: 6px; padding: 7px 9px; border: 0.5px solid var(--border); }
+.cm-item.span2 { grid-column: span 2; }
+.cm-item.ar-row { background: #fff5f5; border-color: #fecaca; }
+.cm-lbl { display: block; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: .04em; margin-bottom: 2px; }
+.cm-val { font-size: 12px; color: var(--text2); font-weight: 500; }
+.cm-val.ar { color: var(--red); font-weight: 700; }
+.cm-val.notes { color: var(--text2); font-weight: 400; font-style: italic; }
+.cm-hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -398,6 +473,12 @@ body {
     <button class="btn" id="paste-btn" onclick="togglePaste()">貼入 JSON</button>
 
   </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" id="tab-dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  <button class="tab-btn" id="tab-clients" onclick="switchTab('clients')">🏢 Client Master</button>
 </div>
 
 <div class="accounts-panel" id="accounts-panel" style="display:none; margin-bottom:0;">
@@ -1520,16 +1601,244 @@ function clearPaste() {
 ══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadAccountsFromStorage();
+  buildClientMaster();
+  cmGo();
   const ta = document.getElementById('json-input');
   if (ta) {
     ta.addEventListener('focus', () => document.getElementById('paste-panel').classList.add('active'));
     ta.addEventListener('blur',  () => document.getElementById('paste-panel').classList.remove('active'));
   }
-  // ESC to close deal panel
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { document.getElementById('deal-overlay').classList.remove('open'); document.body.style.overflow = ''; }
   });
 });
+
+/* ══════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════ */
+function switchTab(tab) {
+  const isDash = tab === 'dashboard';
+  document.getElementById('tab-dashboard').classList.toggle('active', isDash);
+  document.getElementById('tab-clients').classList.toggle('active', !isDash);
+  // dashboard view elements
+  ['paste-panel','accounts-panel','main'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.style.display !== 'none' && isDash) {} // keep current state
+  });
+  document.getElementById('client-master').style.display = isDash ? 'none' : 'block';
+  if (isDash) {
+    document.getElementById('client-master').style.display = 'none';
+  } else {
+    // hide dashboard panels when on client tab
+    document.getElementById('paste-panel').style.display = 'none';
+    document.getElementById('accounts-panel').style.display = 'none';
+    document.getElementById('client-master').style.display = 'block';
+  }
+}
+
+/* ══════════════════════════════════════════
+   CLIENT MASTER DATA
+══════════════════════════════════════════ */
+const CM_CLIENTS = [
+  // ── MALAYSIA ──
+  {mkt:'MY',name:'A Cell Global',stage:'Qualified (QSL)',prob:'10%',ar:null,svc:'KOL/KOC + Ads',owner:'jiajia khoo',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-15',end:'2026-08-15',note:'KOL + TikTok streaming; meeting 5 Jun',profile:'A Cell Global 是活躍於 TikTok 及 Instagram 的美容保健品牌，主要銷售細胞修復保健補充品。透過 KOL 合作與 TikTok 直播帶貨銷售推廣，目標客群以注重抗老化需求的 30–55 歲消費者為主。Tagtoo 洽談 XHS KOL 及 TikTok 串流合作。'},
+  {mkt:'MY',name:'Adelais (AU Fashion Group)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Ruby Teng',gcm:'MYR 373,920',crm:'MYR 420,000',months:'Jan–Jun',inv:'Open | PAC',start:'2026-01-01',end:'2026-12-31',note:'Full year Google & FB; campaign running',profile:'AU Fashion Group 旗下馬來西亞女性內衣品牌，深耕 Google 與 Facebook 廣告。Tagtoo 負責全年廣告管理，是 MY 重要長期客戶。'},
+  {mkt:'MY',name:'ASUS Malaysia',stage:'Demo Meeting',prob:'30%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'MYR 34,954',crm:'MYR 20,000',months:'Jan/Feb/May',inv:'—',start:'2026-08-01',end:'2026-09-30',note:'Planning Q3 XHS KOC campaign',profile:'全球電腦硬體品牌，在馬來西亞透過 Asustek Computer Malaysia 運營。Tagtoo 協助規劃 XHS KOC 行銷，針對馬來西亞華人消費者。'},
+  {mkt:'MY',name:'Atas Frozen',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Ads',owner:'jiajia khoo',gcm:'MYR 2,850',crm:'MYR 1,000',months:'Jan/May/Jun',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'2 TikTok KOC posts',profile:'馬來西亞精品冷凍食品品牌，定位中高收入家庭市場。Tagtoo 執行 TikTok KOC 口碑行銷。'},
+  {mkt:'MY',name:'Berjaya Times Square',stage:'Proposal Sent',prob:'30%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'—',crm:'MYR 15,000',months:'—',inv:'—',start:'2026-08-01',end:'2026-09-30',note:'XHS KOC for theme park; management reviewing',profile:'吉隆坡最具規模的綜合購物商場之一，積極透過 XHS 擴大華人旅客來客量。Tagtoo 規劃 XHS KOC 種草行銷。'},
+  {mkt:'MY',name:'Celynda (Modenza)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 30,000',crm:'MYR 54,000',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-07-31',note:'Meta + TikTok ads running',profile:'馬來西亞本地女性內衣與泳裝品牌，主打時尚設計感與親民價格。Tagtoo 負責 Meta 及 TikTok 廣告投放。'},
+  {mkt:'MY',name:'Cheongdam Almas',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Social',owner:'jiajia khoo',gcm:'MYR 26,474',crm:'MYR 43,000',months:'Jan–Jun',inv:'Open | PAC',start:'2025-09-01',end:'2026-12-31',note:'Ads + XHS KOC; renew client',profile:'韓系醫美診所品牌，主打高品質韓系醫美體驗。Tagtoo 負責 XHS KOC 種草及 Google 廣告。'},
+  {mkt:'MY',name:'Cinnamon Group',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'—',crm:'MYR 7,524',months:'—',inv:'Paid | PIA',start:'2026-03-01',end:'2027-05-26',note:'XHS account management',profile:'馬來西亞餐飲集團，旗下擁有多個風格各異的餐廳品牌。Tagtoo 協助 XHS 帳號驗證與社群內容管理。'},
+  {mkt:'MY',name:'DawnBridge',stage:'Proposal Sent',prob:'10%',ar:null,svc:'Social/Content',owner:'jiajia khoo',gcm:'—',crm:'MYR 8,000',months:'—',inv:'—',start:'2026-07-01',end:'2026-08-31',note:'SMM + ads; client reviewing',profile:'馬來西亞 SME，探索社群媒體管理與廣告投放的外包需求。Tagtoo 協助建立廣告投放基礎架構。'},
+  {mkt:'MY',name:'Forklift4s / NOGAP Creative',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 36,000',crm:'MYR 130,236',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Google ads Jan-Dec; IO renewed',profile:'馬來西亞工業叉車租賃與銷售服務商，由 NOGAP CREATIVE 負責行銷。Tagtoo 負責全年 Google 廣告管理。'},
+  {mkt:'MY',name:'Hanshin Hankyu',stage:'Proposal Sent',prob:'10%',ar:null,svc:'Ads Management',owner:'jiajia khoo',gcm:'—',crm:'MYR 30,000',months:'—',inv:'—',start:'2026-08-01',end:'2026-12-31',note:'Full funnel marketing proposal; VPON group briefed',profile:'日本知名百貨零售集團，積極向東南亞市場擴展。Tagtoo 協助透過 Full-Funnel 數位廣告觸及東南亞華人高消費族群。'},
+  {mkt:'MY',name:'Herbal Farmer (BHH Products)',stage:'Closed Won',prob:'100%',ar:'⚠️ AR ~MYR 200K+ on repayment plan',svc:'KOL/KOC',owner:'jiajia khoo',gcm:'MYR 38,874',crm:'MYR 38,124',months:'Jan/Feb/Mar/Jun',inv:'Open | PAC',start:'2026-06-15',end:'2026-07-31',note:'⚠️ AR ~MYR 200K+ repayment plan; KOC June',profile:'馬來西亞本土草本美容與保健品牌，由 BHH Products Sdn Bhd 營運。⚠️ 目前 AR 約 MYR 200K+ 執行分期還款計畫，需密切追蹤。'},
+  {mkt:'MY',name:'IEM Skincare',stage:'Demo Meeting',prob:'10%',ar:null,svc:'Ads Management',owner:'jiajia khoo',gcm:'—',crm:'MYR 5,000',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'SG & MY performance ads; post-meeting proposal',profile:'馬來西亞美容保養品牌，主打針對東南亞氣候研發的護膚產品。Tagtoo 協助規劃 KOC 及 SG/MY performance ads。'},
+  {mkt:'MY',name:'IQI Real Estate',stage:'Proposal Sent',prob:'20%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'—',crm:'MYR 15,500',months:'—',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'Meta ads; still considering price',profile:'馬來西亞知名跨國房產代理集團，在全球超過 30 個國家設有業務。Tagtoo 協助規劃 Meta 廣告吸引潛在購房者。'},
+  {mkt:'MY',name:'JND Design Agency',stage:'Negotiation / Review',prob:'30%',ar:null,svc:'Ads Management',owner:'Ruby Teng',gcm:'—',crm:'MYR 2,000',months:'—',inv:'—',start:'2026-07-01',end:'2026-08-31',note:'Agency managing client accounts under Tagtoo',profile:'馬來西亞室內設計公司，透過白標方式協助旗下客戶管理數位廣告帳戶。Tagtoo 洽談廣告代管合作。'},
+  {mkt:'MY',name:'JannahNoe Empire',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 168,657',crm:'MYR 63,000',months:'Jan–Jun',inv:'—',start:'2026-06-01',end:'2026-08-31',note:'Meta + TikTok campaign renew Jun-Aug',profile:'馬來西亞知名穆斯林時尚品牌，主打時尚伊斯蘭女裝。Tagtoo 負責 Meta 及 TikTok 廣告管理。'},
+  {mkt:'MY',name:'Jubin BMS (1990)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads + Social',owner:'jiajia khoo',gcm:'MYR 1,800',crm:'MYR 257,550',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Google + FB full year + XHS; renew long-term client',profile:'馬來西亞知名陶瓷磁磚與建材代理商，成立超過 30 年。Tagtoo 負責 Google、Facebook 全年廣告及 XHS 帳號運營。'},
+  {mkt:'MY',name:'Kikyo (Kokoronokate)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'MYR 750',crm:'MYR 810',months:'May',inv:'—',start:'2026-05-21',end:'2027-05-21',note:'XHS account verification renewal',profile:'馬來西亞日系甜點與烘焙咖啡廳品牌，以日式麻糬、和菓子著稱。Tagtoo 提供 XHS 帳號驗證服務。'},
+  {mkt:'MY',name:'Kyo KL (Kyo Malaysia)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'MYR 34,954',crm:'MYR 810',months:'Jan/Feb/May',inv:'—',start:'2026-05-16',end:'2027-05-16',note:'XHS account verification renewal',profile:'馬來西亞吉隆坡日式餐廳與酒吧品牌，提供正宗日本料理及日式居酒屋體驗。Tagtoo 提供 XHS 帳號驗證服務。'},
+  {mkt:'MY',name:'Lovebite (LB International)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 24,000',crm:'MYR 156,000',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Full year Meta FB campaign',profile:'LB International 旗下女性內衣品牌，在 Shopee/Lazada 有穩定銷售表現。Tagtoo 負責全年 Meta 廣告管理。'},
+  {mkt:'MY',name:'MZ Clinic (KIMZO Aesthetic)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'MYR 2,500',crm:'MYR 2,500',months:'Apr',inv:'Paid | PIA',start:'2026-03-01',end:'2026-06-30',note:'XHS KOC 種草 campaign',profile:'KIMZO Aesthetic 旗下醫學美容診所。Tagtoo 協助 XHS KOC 種草行銷。'},
+  {mkt:'MY',name:"McDonald's via Nuffnang",stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'—',crm:'MYR 22,650',months:'—',inv:'—',start:'2026-02-10',end:'2026-05-31',note:'CNY + May local XHS KOL campaigns',profile:'透過 Nuffnang 委託 Tagtoo 執行麥當勞馬來西亞 XHS KOC 口碑行銷，針對馬來西亞華人消費者。'},
+  {mkt:'MY',name:'My Wedding Expo (KH Events)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'jiajia khoo',gcm:'MYR 6,900',crm:'MYR 6,900',months:'Jun',inv:'Paid | PIA',start:'2026-06-01',end:'2026-06-30',note:'KOC posting starts June; client paid',profile:'馬來西亞知名婚禮展覽品牌，定期舉辦婚博會。Tagtoo 執行 XHS KOC 行銷協助接觸準新人消費族群。'},
+  {mkt:'MY',name:'Myung Ga F&B',stage:'Contract Send',prob:'95%',ar:'⚠️ Contract on hold – internal issue',svc:'Ads Management',owner:'jiajia khoo',gcm:'—',crm:'MYR 3,800',months:'—',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'⚠️ Contract on hold – internal issue 28/5',profile:'馬來西亞吉隆坡韓式料理餐廳。⚠️ 合約目前因內部問題 hold 住（5/28）。'},
+  {mkt:'MY',name:'Natural Signature',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Ruby Teng',gcm:'MYR 67,200',crm:'USD 60,000',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Full year Google + FB; long-term client',profile:'馬來西亞本土天然有機美容保養品牌。Tagtoo 負責全年 Google 與 Facebook 廣告投放。'},
+  {mkt:'MY',name:'NeoLivin (Neo Notion)',stage:'Closed Won',prob:'100%',ar:'⚠️ AR MYR 94K – unresponsive',svc:'Ads Management',owner:'jiajia khoo',gcm:'MYR 247,800',crm:'MYR 210,000',months:'Jan–Jun',inv:'Open | PAC',start:'2026-06-01',end:'2026-12-31',note:'⚠️ AR MYR 94K unresponsive; renew contract 2026',profile:'馬來西亞現代室內家具品牌，由 Neo Notion Sdn Bhd 營運。⚠️ AR MYR 94K 逾期問題，需持續追蹤。'},
+  {mkt:'MY',name:'Onswork Media',stage:'Verbal Committed',prob:'90%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'MYR 750',crm:'MYR 3,000',months:'Mar',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'XHS ads management; back in July',profile:'馬來西亞數位媒體與設計代理商，協助客戶管理 XHS 帳號驗證與內容運營。Tagtoo 合作 XHS 廣告管理。'},
+  {mkt:'MY',name:'Riccione Furniture / Sail',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads Management',owner:'jiajia khoo',gcm:'MYR 59,654',crm:'MYR 95,000',months:'Jan–Jun',inv:'Open | PIA',start:'2026-01-01',end:'2026-12-31',note:'Main brand + Sail sub-brand; renew',profile:'馬來西亞知名義大利風格進口家具品牌，旗下同時推出副品牌 Sail。Tagtoo 同時管理兩品牌 Meta 廣告。'},
+  {mkt:'MY',name:'Sipzz Malaysia',stage:'Proposal Sent',prob:'20%',ar:null,svc:'Ads',owner:'Ruby Teng',gcm:'MYR 34,954',crm:'MYR 10,000',months:'Jan/Feb/May',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'TikTok ads proposal; no reply yet',profile:'馬來西亞手搖飲料品牌，主打個性化口感特色飲品。Tagtoo 協助規劃 TikTok 廣告活動。'},
+  {mkt:'MY',name:'Sunup Healthcare (Chicco/Tanita/Bebe Amico)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 46,400',crm:'MYR 197,000',months:'Jan–Jun',inv:'Open | PIA',start:'2026-05-01',end:'2026-12-31',note:'3 brands: Chicco Meta, Tanita, Bebe Amico all running',profile:'馬來西亞健康與嬰幼兒產品代理商，代理 Chicco、Tanita、Bebe Amico 等多個國際品牌。Tagtoo 同時管理三品牌廣告。'},
+  {mkt:'MY',name:'The Black Bow',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'jiajia khoo',gcm:'MYR 11,575',crm:'MYR 250',months:'Jan–May',inv:'—',start:'2026-06-03',end:'2026-06-30',note:'S2S renewal',profile:'馬來西亞精品時尚配件品牌，主打高質感手袋及女性配飾。Tagtoo 執行 S2S 追蹤設定。'},
+  {mkt:'MY',name:'Thermos Malaysia',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 34,954',crm:'MYR 164,000',months:'Jan/Feb/May',inv:'Open | PIA',start:'2026-05-01',end:'2026-12-31',note:'IO renew May-Dec; FB + TikTok + Google + S2S',profile:'全球真空保溫品牌，在馬來西亞具有極高品牌認知度。Tagtoo 負責 FB、TikTok、Google 多平台廣告管理及 S2S 追蹤。'},
+  {mkt:'MY',name:'UMMA (Dimensi Moda)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 2,000',crm:'MYR 88,000',months:'Feb/Mar',inv:'—',start:'2026-05-01',end:'2026-12-31',note:'FB + TikTok May-Dec running',profile:'馬來西亞穆斯林時尚電商品牌，由 Dimensi Moda Sdn Bhd 營運。Tagtoo 負責 Facebook 與 TikTok 多平台廣告投放。'},
+  {mkt:'MY',name:'iQueen (AWJY Trading)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'jiajia khoo',gcm:'MYR 22,453',crm:'USD 229,600',months:'Jan–Jun',inv:'—',start:'2026-05-01',end:'2026-12-31',note:'SG + MY Google + Shopee ads; campaign running',profile:'新加坡與馬來西亞市場女性美容保健品牌。Tagtoo 負責 SG 與 MY 雙市場的 Google 及 Shopee 廣告。'},
+  {mkt:'MY',name:'佳格食品 (Quaker)',stage:'Negotiation / Review',prob:'40%',ar:null,svc:'KOL/KOC',owner:'jiajia khoo',gcm:'—',crm:'MYR 30,000',months:'—',inv:'—',start:'2026-08-01',end:'2026-10-31',note:'NDA signed 6/3; discussing KOC plan',profile:'台灣知名食品集團，PepsiCo 旗下 Quaker 品牌授權生產商。Tagtoo 探索馬來西亞市場的 KOC 及廣告投放合作。'},
+  // ── INDONESIA ──
+  {mkt:'ID',name:'Agora Hotel Japan',stage:'Proposal Sent',prob:'10%',ar:null,svc:'Ads Management',owner:'Sophie Ellen',gcm:'—',crm:'IDR 300M',months:'—',inv:'—',start:'2026-07-01',end:'2026-10-30',note:'Listing ads for 3 Tokyo hotels; US/AU/UK/TW/HK targets',profile:'日本東京精品商務酒店品牌，旗下設有 AGORA Asakusa、Ginza 及 Tsuki Tokyo 三個物件。Tagtoo 協助評估跨境 Listing Ads 可行性。'},
+  {mkt:'ID',name:'Bank Sinarmas (BSIM)',stage:'Negotiation / Review',prob:'85%',ar:'⚠️ Vendor onboarding; IDR 3.4B deal',svc:'Ads',owner:'Brian Wilson',gcm:'—',crm:'IDR 3,400M',months:'—',inv:'—',start:'2026-06-01',end:'2026-11-30',note:'⚠️ In-App Ads IDR 3.4B; vendor onboarding in progress',profile:'隸屬印尼 Sinarmas 集團的商業銀行。⚠️ Tagtoo 執行 In-App Ads 合作（IDR 3.4B），目前處於 Negotiation 階段，Vendor Onboarding 進行中。'},
+  {mkt:'ID',name:'BeautyHaul Indonesia',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Live Commerce',owner:'Brian Wilson',gcm:'—',crm:'IDR 55M',months:'—',inv:'—',start:'TBD',end:'TBD',note:'Live streaming proposal',profile:'印尼知名美妝電商平台與 KOL 整合行銷公司。Tagtoo 正在協助規劃 Live Streaming 直播電商方案。'},
+  {mkt:'ID',name:'BNI Life (via Sciodigital)',stage:'Negotiation / Review',prob:'80%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'IDR 17M',crm:'IDR 535M',months:'Feb/Mar/Apr',inv:'—',start:'2026-06-15',end:'2026-07-31',note:'KOL negotiation between brand and Sciodigital',profile:'BNI 旗下壽險子公司，透過 Sciodigital 數位代理商轉介。Tagtoo 協助執行 BNI Life 的 KOL 行銷活動。'},
+  {mkt:'ID',name:'Brother Indonesia (via Sciodigital)',stage:'Proposal Sent',prob:'50%',ar:null,svc:'Ads + Live Commerce',owner:'Grace Tobing',gcm:'—',crm:'IDR 30M',months:'—',inv:'—',start:'2026-06-29',end:'2026-07-27',note:'TikTok Live Shop proposal under review',profile:'日本 Brother Industries 在印尼推廣家用縫紉機及辦公印表機，透過 Sciodigital 轉介。Tagtoo 規劃 TikTok Live Shop 直播電商方案。'},
+  {mkt:'ID',name:'Ce Wati (愛恩國際)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sophie Ellen',gcm:'TWD 183,600',crm:'TWD 226,000',months:'Jan/Feb/Mar/May/Jun',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'Meta + TikTok cross-border ads Q1+Q2',profile:'台灣愛恩國際企業旗下跨境電商品牌，透過印尼市場的 TikTok 及 Meta 廣告推廣美容保健消費品。'},
+  {mkt:'ID',name:'Chicco Indonesia (3048)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Ads',owner:'Sophie Ellen',gcm:'IDR 12M',crm:'IDR 362M',months:'Jan',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'KOL + Meta CPAS Q1+Q2; Ramadan campaign',profile:'義大利知名嬰幼兒用品品牌，在印尼定位中高端母嬰品牌。Tagtoo 負責 Meta CPAS 廣告及 KOL 多季度行銷活動。'},
+  {mkt:'ID',name:'Counterpain (PT Taisho Pharmaceutical)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 100M',crm:'IDR 1,075M',months:'Jan',inv:'—',start:'2026-04-01',end:'2026-09-30',note:'Apr-May campaign done; Q3 follow-up KOL in demo stage',profile:'印尼最廣為人知的外用止痛凝膠/乳霜品牌，暢銷超過半世紀。Tagtoo 執行多個大型 KOL 行銷活動。'},
+  {mkt:'ID',name:'EUI Money (Indomoney)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sophie Ellen',gcm:'TWD 66,000',crm:'TWD 734,884',months:'Jan/Feb/Mar',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'App install ads ID/PH/VT; Q1+Q2',profile:'印尼金融科技應用程式，提供個人理財、小額貸款及數位支付功能。Tagtoo 負責印尼、菲律賓及越南市場的 App Install 廣告。'},
+  {mkt:'ID',name:'Flint Indonesia',stage:'Demo Meeting',prob:'5%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'—',crm:'IDR 30M',months:'—',inv:'—',start:'2026-06-15',end:'2026-06-30',note:'KOL demo stage',profile:'印尼新創科技公司，對 KOL 行銷服務有需求。Tagtoo 正在協助規劃 KOL 合作方案。'},
+  {mkt:'ID',name:'Flou by Pokana',stage:'Proposal Sent',prob:'50%',ar:null,svc:'Ads Management',owner:'Sophie Ellen',gcm:'IDR 19.8M',crm:'IDR 200M',months:'May/Jun',inv:'—',start:'2026-08-01',end:'2026-09-30',note:'H2 2026 campaign; delayed from H1',profile:'Pokana 旗下女性私密保養品牌。Tagtoo 已規劃 H2 2026 廣告活動提案，是 Pokana 集團擴展合作範疇的重要新品牌。'},
+  {mkt:'ID',name:'Grab Indonesia',stage:'Demo Meeting',prob:'20%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'—',crm:'IDR 50M',months:'—',inv:'—',start:'2026-05-26',end:'2026-06-15',note:'KOL for Grab For Business service',profile:'東南亞最大超級應用程式平台。Tagtoo 正在協助 Grab For Business 執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Green Parenting (TNP Maternity)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 15.8M',crm:'IDR 7M',months:'May/Jun',inv:'—',start:'2026-05-13',end:'2026-05-31',note:'Shopee CPAS campaign',profile:'PT TNP Maternity and Baby Trading 旗下環保育兒品牌。Tagtoo 協助執行 Shopee CPAS 廣告活動。'},
+  {mkt:'ID',name:'Hello Navan',stage:'Proposal Sent',prob:'5%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 12.6M',crm:'IDR 20M',months:'Apr/May/Jun',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'CPAS proposal for travel app',profile:'印尼旅遊科技應用程式，提供一站式旅遊行程規劃及訂房服務。Tagtoo 協助執行 KOL 行銷及 CPAS 廣告活動。'},
+  {mkt:'ID',name:'Hoki Shop',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sophie Ellen',gcm:'TWD 1,589,280',crm:'IDR 901.7M',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'App install campaign Q1+Q2; multi-market',profile:'印尼本地購物比價 App。Tagtoo 負責多季度 App Install 廣告，在印尼、菲律賓、越南執行。'},
+  {mkt:'ID',name:'IVF Morula Clinic',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 11.1M',crm:'IDR 53.5M',months:'Apr/May/Jun',inv:'—',start:'2026-04-30',end:'TBD',note:'KOL campaign done; next phase KOL+Publisher in demo',profile:'印尼知名生殖醫學與試管嬰兒（IVF）醫療機構，隸屬大型醫療集團。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Indocafe',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'IDR 40M',crm:'IDR 20M',months:'May/Jun',inv:'—',start:'2026-06-08',end:'2026-07-10',note:'KOL campaign running',profile:'PT Berkat Nusantara Bersinar 代理的印尼知名即溶咖啡品牌。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Indopaket (PT INTI PAKET PRIMA)',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Social/Content',owner:'Brian Wilson',gcm:'—',crm:'IDR 380M',months:'—',inv:'—',start:'2026-07-01',end:'2027-03-01',note:'Branding campaign proposal',profile:'印尼物流快遞服務公司。Tagtoo 正在協助規劃品牌廣告活動。'},
+  {mkt:'ID',name:'Isaku / Indomaret (PT Inti Dunia Sukses)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 7.5M',crm:'IDR 20M',months:'Jan',inv:'—',start:'2025-12-01',end:'2026-01-31',note:'App install ads; completed',profile:'PT Inti Dunia Sukses 旗下 App，與 Indomaret（印尼最大便利商店連鎖）緊密合作。Tagtoo 協助執行 App Install 廣告。'},
+  {mkt:'ID',name:'JamBor (Borobudur Herbal)',stage:'Demo Meeting',prob:'20%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'—',crm:'IDR 150M',months:'—',inv:'—',start:'2026-06-22',end:'2026-07-26',note:'Ads + affiliate proposal in demo',profile:'印尼草本保健品牌，主打婆羅浮屠傳統草藥配方。Tagtoo 協助規劃 Ads 廣告與 Affiliate 聯盟行銷雙軌方案。'},
+  {mkt:'ID',name:'Kratingdaeng / Red Bull ID (Alembana)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian / Sophie',gcm:'IDR 648M',crm:'IDR 2,808M',months:'Feb',inv:'—',start:'2026-02-10',end:'2026-03-31',note:'Ramadan + IBL mega KOL campaign; completed',profile:'印尼能量飲料市場絕對龍頭品牌。Tagtoo 執行多個大型 KOL 行銷活動（Ramadan + IBL）。'},
+  {mkt:'ID',name:'Mie Gaga (Gaga Mie)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Sophie Ellen',gcm:'IDR 34.5M',crm:'IDR 46M',months:'Apr/May/Jun',inv:'—',start:'2026-04-01',end:'2026-07-31',note:'SMM campaign post-Eid; running',profile:'印尼特色即食泡麵品牌，以極辣口味著稱，善用社群媒體行銷。Tagtoo 協助執行 SMM 社群媒體管理服務。'},
+  {mkt:'ID',name:'Mooimom / Momcozy (TNP Maternity)',stage:'Closed Won',prob:'100%',ar:'⚠️ AR IDR 398.5M committed',svc:'Ads',owner:'Brian Wilson',gcm:'IDR 49.2M',crm:'IDR 335M',months:'May/Jun',inv:'Open | PIA',start:'2025-12-01',end:'2027-06-01',note:'⚠️ AR IDR 398.5M; Shopee CPAS + Meta + TikTok Shop',profile:'印尼知名孕產期服飾品牌，由 TnP Maternity 旗下經營。⚠️ 目前存在 AR IDR 398.5M 帳款問題，需積極追蹤。'},
+  {mkt:'ID',name:'Oxford University Press (OUP)',stage:'Proposal Sent',prob:'30%',ar:null,svc:'Ads Management',owner:'Sophie Ellen',gcm:'—',crm:'TWD 50,000',months:'—',inv:'—',start:'2026-10-15',end:'2026-11-15',note:'ID minor market ads proposal',profile:'全球最大大學出版社之一，在東南亞主要業務為語言學習出版品及高等教育資源。Tagtoo 同時為泰國及印尼市場提供廣告方案。'},
+  {mkt:'ID',name:'Paramex (Bintang Toedjoe)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'IDR 4M',crm:'IDR 2M',months:'May/Jun',inv:'—',start:'2026-05-18',end:'2026-05-22',note:'KOL campaign; completed',profile:'Bintang Toedjoe 旗下印尼知名止痛藥品牌，家喻戶曉的 OTC 止痛藥。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Pokana (PT Tata Global Sentosa)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 19.8M',crm:'IDR 15M',months:'May/Jun',inv:'—',start:'2026-05-19',end:'2026-05-31',note:'Pokana + MomBaby KOL campaigns',profile:'印尼知名嬰兒紙尿布品牌，在印尼嬰幼兒紙尿布市場具有相當市佔率。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Polytron Indonesia (via Wolfgeng)',stage:'Proposal Sent',prob:'30%',ar:null,svc:'KOL/KOC',owner:'Sophie Ellen',gcm:'—',crm:'IDR 726.5M',months:'—',inv:'—',start:'2026-03-31',end:'2026-05-01',note:'KOL proposal via Wolfgeng agency',profile:'印尼本土知名消費電子品牌，透過 Wolfgeng 代理商執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Sensodyne (Haleon)',stage:'Proposal Sent',prob:'50%',ar:null,svc:'Social/Content',owner:'Grace Tobing',gcm:'—',crm:'IDR 96M',months:'—',inv:'—',start:'2026-07-06',end:'2027-07-05',note:'Content creation proposal; annual contract',profile:'Haleon 旗下全球知名抗敏感牙膏品牌。Tagtoo 協助規劃 Content Creation 內容製作服務。'},
+  {mkt:'ID',name:'Skin Evo Indonesia',stage:'Demo Meeting',prob:'30%',ar:null,svc:'Ads + Social',owner:'Brian Wilson',gcm:'IDR 156.1M',crm:'IDR 10M',months:'Jan–Jun',inv:'—',start:'TBD',end:'TBD',note:'Content creation + Google/Meta ads',profile:'印尼本土護膚品牌，主打針對東南亞熱帶氣候設計的美白、控油及防曬系列。Tagtoo 協助規劃 Content Creation 及廣告整合方案。'},
+  {mkt:'ID',name:'Spill Jakarta',stage:'Proposal Sent',prob:'50%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'—',crm:'IDR 60M',months:'—',inv:'—',start:'2026-06-29',end:'2026-09-30',note:'KOL proposal; client reviewing',profile:'印尼雅加達 F&B 餐飲與生活風格品牌，在 Instagram 及 TikTok 上具有都市年輕族群追蹤者基礎。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Technogym Indonesia',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 180M',crm:'IDR 360M',months:'Jan–Jun',inv:'—',start:'2025-09-01',end:'2026-03-31',note:'Multi-platform ads; FB/Google/MS; completed',profile:'義大利頂級健身器材品牌，客戶涵蓋奧運賽場、五星飯店及高端健身中心。Tagtoo 負責多平台廣告管理。'},
+  {mkt:'ID',name:'Vinko Indonesia',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 15M',crm:'IDR 5M',months:'Apr/May/Jun',inv:'—',start:'2026-05-01',end:'2026-05-09',note:'Affiliate campaign; completed',profile:'印尼消費品品牌，透過 Affiliate 聯盟行銷模式推廣產品。Tagtoo 協助執行 Affiliate 行銷活動。'},
+  {mkt:'ID',name:'XL Satu (XL Axiata)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Sophie Ellen',gcm:'—',crm:'IDR 417.2M',months:'—',inv:'—',start:'2026-01-01',end:'2026-02-28',note:'Branding campaign; completed',profile:'印尼電信集團 XL Axiata 推出的一站式家庭數位服務方案。Tagtoo 協助執行品牌廣告活動。'},
+  {mkt:'ID',name:'Yves Rocher Indonesia',stage:'Demo Meeting',prob:'10%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'—',crm:'IDR 120M',months:'—',inv:'—',start:'TBD',end:'TBD',note:'Affiliate marketing proposal',profile:'法國知名植物美妝品牌，以植物萃取成分為核心配方，在全球 80 多個國家設有分店。Tagtoo 協助規劃 Affiliate 聯盟行銷方案。'},
+  // ── THAILAND ──
+  {mkt:'TH',name:'B-KOOL Thailand',stage:'Qualified (QSL)',prob:'15%',ar:null,svc:'Ads',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'TBD',end:'TBD',note:'Breast milk bag; Shopee CPAS; referred by Baby Lovett',profile:'泰國本土哺乳輔助產品品牌，主打儲奶袋與哺乳媽媽相關用品。透過 Baby Lovett CEO 轉介給 Tagtoo，評估 Shopee CPAS 廣告方案。'},
+  {mkt:'TH',name:'Baby Lovett Thailand (Asawaroj)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sam',gcm:'THB 180,008',crm:'THB 602,000',months:'Jan–Jun',inv:'Paid | PIA',start:'2026-04-01',end:'2026-12-31',note:'Contract Apr-Dec; CPAS+Google+TikTok running',profile:'泰國嬰幼兒益智玩具與教育產品代理商，由 Asawaroj Co., Ltd. 經營。Tagtoo 進入泰國市場的核心客戶，負責 Shopee CPAS、Google 及 TikTok 廣告。'},
+  {mkt:'TH',name:'Greenday Thailand',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'Waiting for client brief; event ends 30 May',profile:'泰國健康有機食品品牌，主打天然有機蔬果乾及功能性食品系列。Tagtoo 正與 Greenday 洽談廣告合作。'},
+  {mkt:'TH',name:'Oxford University Press (TH)',stage:'Qualified (QSL)',prob:'10%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'TWD 600,000',months:'—',inv:'—',start:'2026-08-01',end:'TBD',note:'Budget + KPIs not locked; takes 2 more weeks',profile:'全球最大大學出版社之一。Tagtoo 同時為泰國及印尼市場提供廣告方案，是跨市場教育品牌合作案例。'},
+  {mkt:'TH',name:'Playmobil Thailand',stage:'Qualified (QSL)',prob:'10%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'TBD',end:'TBD',note:'German toy brand; meeting 6/15 BKK; referred by Baby Lovett CEO',profile:'德國著名教育玩具品牌，在全球 130 多個國家銷售。透過 Baby Lovett CEO 轉介，計劃於曼谷進行面談。'},
+  {mkt:'TH',name:'SY Agency (Chinese Ads)',stage:'Demo Meeting',prob:'30%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'Meeting BKK 5/29; Douyin ads discussion',profile:'泰國數位行銷代理商，專注於協助品牌客戶進入中文語系市場，特別是抖音及 XHS 平台廣告投放。Tagtoo TH 首個代理商渠道合作案例。'},
+  {mkt:'TH',name:'YVIS Thailand',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Social/Content',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'Thai accessories; XHS ads interest; aligning internally',profile:'泰國飾品與配件品牌，主打時尚感強烈的輕珠寶系列。Tagtoo 協助評估 XHS 廣告投放可行性。'},
+];
+
+function cmStageColor(stage) {
+  if (stage.includes('Closed Won')) return '#276749';
+  if (stage.includes('Verbal') || stage.includes('Contract')) return '#B7791F';
+  if (stage.includes('Negotiation')) return '#B7791F';
+  if (stage.includes('Proposal')) return '#2B6CB0';
+  if (stage.includes('Demo')) return '#6B46C1';
+  return '#718096';
+}
+
+function cmBgColor(stage, hasAr) {
+  if (hasAr) return '#FFF0F0';
+  if (stage.includes('Closed Won')) return '#F0FFF4';
+  if (stage.includes('Verbal') || stage.includes('Negotiation') || stage.includes('Contract')) return '#FFFDE7';
+  if (stage.includes('Proposal')) return '#EBF8FF';
+  if (stage.includes('Demo')) return '#F5F0FF';
+  return '#FAFAFA';
+}
+
+let _cmFilter = 'all';
+function cmSf(f, btn) {
+  _cmFilter = f;
+  document.querySelectorAll('.cm-fb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cmGo();
+}
+function cmGo() {
+  const q = (document.getElementById('cm-q') || {value:''}).value.toLowerCase();
+  const cards = document.querySelectorAll('.cm-card');
+  const hdrs = document.querySelectorAll('.cm-mkt-hdr');
+  let vis = 0;
+  cards.forEach(c => {
+    const txt = c.textContent.toLowerCase();
+    const mkt = c.dataset.mkt || '';
+    const stage = c.dataset.stage || '';
+    const ar = c.dataset.ar || '';
+    let show = true;
+    if (q && !txt.includes(q)) show = false;
+    if (_cmFilter === 'MY' && mkt !== 'MY') show = false;
+    if (_cmFilter === 'ID' && mkt !== 'ID') show = false;
+    if (_cmFilter === 'TH' && mkt !== 'TH') show = false;
+    if (_cmFilter === 'won' && !stage.includes('Closed Won')) show = false;
+    if (_cmFilter === 'pipe' && !['Negotiation','Verbal','Contract','Proposal','Demo'].some(s => stage.includes(s))) show = false;
+    if (_cmFilter === 'ar' && !ar) show = false;
+    c.classList.toggle('cm-hidden', !show);
+    if (show) vis++;
+  });
+  hdrs.forEach(h => {
+    const mkt = h.dataset.mkt;
+    let next = h.nextElementSibling;
+    let hasV = false;
+    while (next && !next.classList.contains('cm-mkt-hdr')) {
+      if (!next.classList.contains('cm-hidden') && next.classList.contains('cm-card')) hasV = true;
+      next = next.nextElementSibling;
+    }
+    h.classList.toggle('cm-hidden', !hasV);
+  });
+  const st = document.getElementById('cm-stats');
+  if (st) st.textContent = `顯示 ${vis} / ${CM_CLIENTS.length} 間公司`;
+}
+
+function buildClientMaster() {
+  const container = document.getElementById('cm-list');
+  if (!container) return;
+  const byMkt = {MY: [], ID: [], TH: []};
+  CM_CLIENTS.forEach(c => (byMkt[c.mkt] || []).push(c));
+  const mktColors = {MY:'#1B5E20', ID:'#7B3F00', TH:'#1A237E'};
+  const mktLabels = {MY:'🇲🇾 Malaysia', ID:'🇮🇩 Indonesia', TH:'🇹🇭 Thailand'};
+  let html = '';
+  ['MY','ID','TH'].forEach(mkt => {
+    html += `<div class="cm-mkt-hdr" style="background:${mktColors[mkt]};" data-mkt="${mkt}">${mktLabels[mkt]}</div>`;
+    byMkt[mkt].forEach(c => {
+      const sc = cmStageColor(c.stage);
+      const bg = cmBgColor(c.stage, !!c.ar);
+      html += `<div class="cm-card" style="background:${bg};border-left:4px solid ${sc};" data-mkt="${c.mkt}" data-stage="${c.stage}" data-ar="${c.ar||''}">
+  <div class="cm-card-hd">
+    <div class="cm-acct">${c.name}</div>
+    <div class="cm-badges">
+      ${c.ar ? `<span class="cm-badge warn">⚠️ AR</span>` : ''}
+      <span class="cm-badge" style="background:${sc};">${c.stage}</span>
+      <span class="cm-badge prob">${c.prob}</span>
+    </div>
+  </div>
+  <div class="cm-profile">${c.profile}</div>
+  <div class="cm-grid">
+    <div class="cm-item"><span class="cm-lbl">服務類型</span><span class="cm-val">${c.svc}</span></div>
+    <div class="cm-item"><span class="cm-lbl">負責人</span><span class="cm-val">${c.owner}</span></div>
+    <div class="cm-item"><span class="cm-lbl">GCM預算</span><span class="cm-val">${c.gcm||'—'}</span></div>
+    <div class="cm-item"><span class="cm-lbl">CRM金額</span><span class="cm-val">${c.crm||'—'}</span></div>
+    <div class="cm-item"><span class="cm-lbl">活躍月份</span><span class="cm-val">${c.months||'—'}</span></div>
+    <div class="cm-item"><span class="cm-lbl">發票狀態</span><span class="cm-val">${c.inv||'—'}</span></div>
+    <div class="cm-item span2"><span class="cm-lbl">合作期間</span><span class="cm-val">${c.start} → ${c.end}</span></div>
+    ${c.ar ? `<div class="cm-item span2 ar-row"><span class="cm-lbl">AR / 付款</span><span class="cm-val ar">${c.ar}</span></div>` : ''}
+    <div class="cm-item span2"><span class="cm-lbl">最新備註</span><span class="cm-val notes">${c.note}</span></div>
+  </div>
+</div>`;
+    });
+  });
+  container.innerHTML = html;
+}
 </script>
+
+<!-- CLIENT MASTER PAGE -->
+<div id="client-master">
+  <div class="cm-controls">
+    <input class="cm-search" id="cm-q" type="text" placeholder="搜尋公司名稱、服務、負責人..." oninput="cmGo()">
+    <div class="cm-filters">
+      <button class="cm-fb active" onclick="cmSf('all',this)">All <b id="cm-n-all">77</b></button>
+      <button class="cm-fb my" onclick="cmSf('MY',this)">🇲🇾 MY</button>
+      <button class="cm-fb id" onclick="cmSf('ID',this)">🇮🇩 ID</button>
+      <button class="cm-fb th" onclick="cmSf('TH',this)">🇹🇭 TH</button>
+      <button class="cm-fb won" onclick="cmSf('won',this)">✅ Won</button>
+      <button class="cm-fb pipe" onclick="cmSf('pipe',this)">🟡 Pipeline</button>
+      <button class="cm-fb ar" onclick="cmSf('ar',this)">⚠️ AR</button>
+    </div>
+  </div>
+  <div class="cm-stats" id="cm-stats">顯示 77 / 77 間公司</div>
+  <div id="cm-list"></div>
+</div>
+
 </body>
 </html>
