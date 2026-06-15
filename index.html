@@ -1380,97 +1380,82 @@ function renderOverview(pipeline) {
   const markets = ['MY','ID','TH'];
   const labels = {MY:'🇲🇾 MY', ID:'🇮🇩 ID', TH:'🇹🇭 TH'};
 
-  // Build grid from VPON_DATA Closed Won (same source as Vpon Stage section below)
-  // Falls back to pipeline JSON stage='Closed Won' for TH (no VPON_DATA for TH)
-  const USD_TO_NTD = 33.5;
+  // Build grid from VPON_DATA Closed Won — USD directly (same source as Vpon Stage bars)
   const grid = {};
-  markets.forEach(m => { grid[m] = {}; months.forEach(mo => { grid[m][mo] = 0; }); });
+  markets.forEach(mk => { grid[mk] = {}; months.forEach(mo => { grid[mk][mo] = 0; }); });
 
-  // MY + ID: read from VPON_DATA
   ['MY','ID'].forEach(mk => {
     const buData = (VPON_DATA||{})[mk] || {};
     Object.entries(buData).forEach(([yyyymm, stages]) => {
-      // Parse month: "2026-05" → "May"
-      const parts = yyyymm.split('-');
-      const mo = months[parseInt(parts[1]) - 1];
+      const mo = months[parseInt(yyyymm.split('-')[1]) - 1];
       if (!mo) return;
-      const cwDeals = stages['5. Closed Won'] || [];
-      cwDeals.forEach(d => {
-        const usd = d.usd || 0;
-        grid[mk][mo] += usd * USD_TO_NTD;
+      (stages['5. Closed Won'] || []).forEach(d => {
+        grid[mk][mo] += (d.usd || 0);
       });
     });
   });
 
-  // TH: fall back to pipeline JSON (no VPON_DATA for TH)
-  const thDeals = (pipeline||{})['TH'] || [];
-  thDeals.forEach(d => {
+  // TH fallback: pipeline JSON stage='Closed Won', assume THB→USD (×0.028)
+  ((pipeline||{})['TH'] || []).forEach(d => {
     if ((d.stage||'').toLowerCase().trim() !== 'closed won') return;
     if (!d.close_date || !d.amount) return;
     const upper = String(d.amount).toUpperCase();
-    const raw = String(d.amount).replace(/[^0-9.]/g,'');
-    let num = parseFloat(raw) || 0;
-    if (/\dB\b/.test(upper)) num *= 1000000000;
-    else if (/\dM\b/.test(upper)) num *= 1000000;
+    const raw = parseFloat(String(d.amount).replace(/[^0-9.]/g,'')) || 0;
+    let num = raw;
+    if (/\dM\b/.test(upper)) num *= 1000000;
     else if (/\dK\b/.test(upper)) num *= 1000;
-    let ntd;
-    if (/THB/.test(upper)) ntd = num * 0.88;
-    else ntd = num; // assume TWD
+    let usd = /THB/.test(upper) ? num * 0.028 : num / 33.5;
     const cd = String(d.close_date);
     let mo = null;
     if (/Q1/i.test(cd)) mo = 'Mar';
     else if (/Q2/i.test(cd)) mo = 'Jun';
     else if (/Q3/i.test(cd)) mo = 'Sep';
     else if (/Q4/i.test(cd)) mo = 'Dec';
-    else {
-      const m2 = cd.match(/\d{4}-(\d{2})/);
-      if (m2) mo = months[parseInt(m2[1])-1];
-      else mo = months.find(m => cd.includes(m)) || null;
-    }
-    if (mo && grid['TH'][mo] !== undefined) grid['TH'][mo] += ntd;
+    else { const m2 = cd.match(/\d{4}-(\d{2})/); if (m2) mo = months[parseInt(m2[1])-1]; }
+    if (mo && grid['TH'][mo] !== undefined) grid['TH'][mo] += usd;
   });
 
-  // Format helper
+  // Format: show in USD (K / M)
   const fmt = v => {
     if (!v) return '<span style="color:var(--text3);">—</span>';
-    if (v >= 1000000) return `<span style="color:var(--green-accent,#22c55e);font-weight:600;">${(v/1000000).toFixed(1)}M</span>`;
-    if (v >= 1000) return `${(v/1000).toFixed(0)}K`;
-    return Math.round(v).toLocaleString();
+    if (v >= 1000000) return `<span style="color:var(--green-accent,#22c55e);font-weight:600;">$${(v/1000000).toFixed(2)}M</span>`;
+    if (v >= 1000)    return `<span style="color:var(--green-accent,#22c55e);font-weight:600;">$${(v/1000).toFixed(0)}K</span>`;
+    return `$${Math.round(v).toLocaleString()}`;
   };
 
-  // Totals
   const rowTotal = mk => Object.values(grid[mk]).reduce((a,b)=>a+b,0);
   const colTotal = mo => markets.reduce((a,mk)=>a+grid[mk][mo],0);
   const grandTotal = markets.reduce((a,mk)=>a+rowTotal(mk),0);
 
-  const thStyle = 'padding:5px 8px;font-size:10px;color:var(--text3);font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border);';
-  const tdStyle = 'padding:5px 8px;font-size:11px;text-align:right;white-space:nowrap;';
-  const tdLbl  = 'padding:5px 8px;font-size:11px;font-weight:600;white-space:nowrap;';
+  const thS = 'padding:5px 8px;font-size:10px;color:var(--text3);font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border);';
+  const tdS = 'padding:5px 8px;font-size:11px;text-align:right;white-space:nowrap;';
+  const tdL = 'padding:5px 8px;font-size:11px;font-weight:600;white-space:nowrap;';
 
-  let html = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${LANG==='zh'?'Closed Won · 單位：NTD 估算（USD×33.5 / IDR via Vpon / MYR via Vpon）':'Closed Won · Unit: NTD est. (USD×33.5, via Vpon data)'}</div>`;
-  html += `<table style="width:100%;border-collapse:collapse;min-width:760px;">`;
-  html += `<tr><th style="${thStyle}text-align:left;">${LANG==='zh'?'市場':'Market'}</th>`;
-  months.forEach(m => { html += `<th style="${thStyle}">${m}</th>`; });
-  html += `<th style="${thStyle}color:var(--fg);">${LANG==='zh'?'合計':'Total'}</th></tr>`;
+  let h = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">`;
+  h += LANG==='zh' ? 'Closed Won · 單位：USD（與下方 Vpon Stage 同源）' : 'Closed Won · Unit: USD (same source as Vpon Stage below)';
+  h += `</div>`;
+  h += `<table style="width:100%;border-collapse:collapse;min-width:760px;">`;
+  h += `<tr><th style="${thS}text-align:left;">${LANG==='zh'?'市場':'Market'}</th>`;
+  months.forEach(mo => { h += `<th style="${thS}">${mo}</th>`; });
+  h += `<th style="${thS}color:var(--fg);">${LANG==='zh'?'合計':'Total'}</th></tr>`;
 
   const dotMap = {MY:'dot-my', ID:'dot-id', TH:'dot-th'};
   markets.forEach(mk => {
-    const hasData = rowTotal(mk) > 0;
-    html += `<tr style="border-top:1px solid var(--border);">`;
-    html += `<td style="${tdLbl}"><span class="mkt-dot ${dotMap[mk]}" style="display:inline-block;"></span>${labels[mk]}</td>`;
-    months.forEach(m => { html += `<td style="${tdStyle}">${fmt(grid[mk][m])}</td>`; });
-    html += `<td style="${tdStyle}font-weight:700;">${hasData ? fmt(rowTotal(mk)) : '<span style="color:var(--text3);">—</span>'}</td>`;
-    html += `</tr>`;
+    h += `<tr style="border-top:1px solid var(--border);">`;
+    h += `<td style="${tdL}"><span class="mkt-dot ${dotMap[mk]}" style="display:inline-block;"></span>${labels[mk]}</td>`;
+    months.forEach(mo => { h += `<td style="${tdS}">${fmt(grid[mk][mo])}</td>`; });
+    const rt = rowTotal(mk);
+    h += `<td style="${tdS}font-weight:700;">${rt > 0 ? fmt(rt) : '<span style="color:var(--text3);">—</span>'}</td>`;
+    h += `</tr>`;
   });
 
-  // SEA Total row
-  html += `<tr style="border-top:2px solid var(--border);background:var(--bg2,rgba(255,255,255,.04));">`;
-  html += `<td style="${tdLbl}color:var(--fg);">🌏 SEA</td>`;
-  months.forEach(m => { html += `<td style="${tdStyle}font-weight:600;">${fmt(colTotal(m))}</td>`; });
-  html += `<td style="${tdStyle}font-weight:700;color:var(--accent);">${fmt(grandTotal)}</td>`;
-  html += `</tr></table>`;
+  h += `<tr style="border-top:2px solid var(--border);background:var(--bg2,rgba(255,255,255,.04));">`;
+  h += `<td style="${tdL}color:var(--fg);">🌏 SEA</td>`;
+  months.forEach(mo => { h += `<td style="${tdS}font-weight:600;">${fmt(colTotal(mo))}</td>`; });
+  h += `<td style="${tdS}font-weight:700;color:var(--accent);">${fmt(grandTotal)}</td>`;
+  h += `</tr></table>`;
 
-  el.innerHTML = html;
+  el.innerHTML = h;
 }
 function renderXero(invoices, id) {
   const el = document.getElementById(id);
