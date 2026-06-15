@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GM Dashboard — Tagtoo Global</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #f7f6f2;
+  --bg2:    #ffffff;
+  --bg3:    #f0eeea;
+  --border: rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.14);
+  --text:   #1a1a18;
+  --text2:  #5a5955;
+  --text3:  #aaa89f;
+  --accent: #2a7a2a;
+  --accent2:#1a5fa8;
+  --red:    #c0392b;
+  --amber:  #b8720a;
+  --purple: #6a4fb8;
+  --green:  #1e7a3a;
+  --blue:   #1a5fa8;
+  --mono:   'DM Mono', monospace;
+  --serif:  'Instrument Serif', serif;
+  --sans:   'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(247,246,242,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 0.5px solid var(--border2);
+  padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 52px;
+}
+.topbar-left { display: flex; align-items: baseline; gap: 12px; }
+.logo { font-family: var(--serif); font-size: 19px; color: var(--text); letter-spacing: -.01em; }
+.logo em { font-style: italic; color: var(--accent); }
+.week-badge {
+  font-family: var(--mono); font-size: 11px; color: var(--text3);
+  border: 0.5px solid var(--border2); border-radius: 4px;
+  padding: 2px 7px; letter-spacing: .06em; background: var(--bg3);
+}
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.ts { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.btn {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .04em;
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  color: var(--text2); padding: 6px 14px; border-radius: 5px;
+  cursor: pointer; transition: all .15s;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); background: #f0f7f0; }
+.btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+.btn.primary:hover { background: #333330; }
+
+/* ── PASTE PANEL ── */
+.paste-panel {
+  margin: 20px 28px;
+  background: var(--bg2);
+  border: 0.5px dashed var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  transition: border-color .2s;
+}
+.paste-panel.active { border-color: var(--accent); border-style: solid; }
+.paste-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; margin-bottom: 10px; }
+.paste-panel textarea {
+  width: 100%; height: 110px;
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 6px; padding: 10px 12px;
+  font-family: var(--mono); font-size: 12px; color: var(--text2);
+  resize: vertical; outline: none; transition: border-color .15s;
+}
+.paste-panel textarea:focus { border-color: var(--accent); }
+.paste-panel textarea::placeholder { color: var(--text3); }
+.paste-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.parse-error { font-family: var(--mono); font-size: 11px; color: var(--red); margin-left: auto; }
+
+/* ── MAIN LAYOUT ── */
+.main { padding: 0 28px 48px; }
+
+/* ── KPI ROW ── */
+.kpi-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 20px; }
+.kpi-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border2);
+  border-radius: 10px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+}
+.kpi-card::after {
+  content: ''; position: absolute; bottom: 0; left: 18px; right: 18px; height: 1.5px;
+  background: var(--accent); transform: scaleX(0); transform-origin: left;
+  transition: transform .25s ease;
+}
+.kpi-card:hover::after { transform: scaleX(1); }
+.kpi-lbl { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; margin-bottom: 8px; }
+.kpi-val { font-family: var(--serif); font-size: 34px; color: var(--text); line-height: 1; }
+.kpi-val.good { color: var(--green); }
+.kpi-val.warn { color: var(--amber); }
+.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: var(--mono); }
+
+/* ── SECTION HEADERS ── */
+.section { margin-bottom: 20px; }
+.section-hd {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border2);
+}
+.mkt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-my { background: #2563c8; }
+.dot-id { background: #18884a; }
+.dot-th { background: #c88a18; }
+.dot-ar { background: var(--red); }
+.dot-cal { background: var(--purple); }
+.section-title { font-family: var(--mono); font-size: 11px; color: var(--text2); letter-spacing: .1em; }
+.section-meta { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+/* ── TWO-COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 10px; padding: 16px 18px;
+}
+.card-title { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; margin-bottom: 12px; }
+
+/* ── LANG BTN ── */
+.lang-btn { font-weight: 600; letter-spacing: .08em; min-width: 38px; }
+.lang-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+/* ── PIPELINE TIMELINE ── */
+.pipe-view-toggle { display: flex; gap: 5px; margin-bottom: 10px; }
+.pipe-tab {
+  font-family: var(--mono); font-size: 10px; padding: 3px 10px;
+  border-radius: 3px; border: 0.5px solid var(--border2);
+  color: var(--text3); background: var(--bg3); cursor: pointer;
+  transition: all .12s;
+}
+.pipe-tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.timeline-quarter { margin-bottom: 14px; }
+.timeline-q-hd {
+  font-family: var(--mono); font-size: 10px; color: var(--text3);
+  letter-spacing: .08em; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.timeline-q-hd::after {
+  content: ''; flex: 1; height: 0.5px; background: var(--border2);
+}
+.timeline-month { margin-bottom: 8px; }
+.timeline-month-hd {
+  font-family: var(--mono); font-size: 9px; color: var(--text3);
+  padding: 2px 6px; background: var(--bg3); border-radius: 3px;
+  display: inline-block; margin-bottom: 4px; letter-spacing: .06em;
+}
+.deal-row.clickable { cursor: pointer; border-radius: 4px; padding: 6px 4px; transition: background .12s; }
+.deal-row.clickable:hover { background: var(--bg3); }
+
+/* ── DEAL DETAIL PANEL ── */
+.deal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.25); backdrop-filter: blur(3px);
+}
+.deal-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+@media (min-width: 600px) {
+  .deal-overlay.open { align-items: center; }
+}
+.deal-panel {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 14px 14px 0 0; width: 100%; max-width: 560px;
+  padding: 24px 24px 32px; box-shadow: 0 -8px 32px rgba(0,0,0,.12);
+  animation: slideUp .2s ease;
+  max-height: 80vh; overflow-y: auto;
+}
+@media (min-width: 600px) {
+  .deal-panel { border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,.15); }
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+.deal-panel-hd {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.deal-panel-name { font-family: var(--serif); font-size: 20px; color: var(--text); line-height: 1.2; }
+.deal-panel-close {
+  font-family: var(--mono); font-size: 18px; color: var(--text3);
+  cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;
+  border: none; background: none;
+}
+.deal-panel-close:hover { color: var(--text); }
+.deal-meta-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 16px;
+}
+.deal-meta-item { }
+.deal-meta-lbl { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: .08em; margin-bottom: 3px; }
+.deal-meta-val { font-size: 13px; color: var(--text2); }
+.deal-meta-val.big { font-family: var(--mono); font-size: 15px; color: var(--text); font-weight: 500; }
+.deal-history { border-top: 0.5px solid var(--border2); padding-top: 14px; }
+.deal-history-hd { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: .08em; margin-bottom: 10px; }
+.deal-hist-row { display: flex; gap: 10px; padding: 5px 0; font-size: 12px; color: var(--text2); border-bottom: 0.5px solid var(--border); }
+.deal-hist-row:last-child { border-bottom: none; }
+.deal-hist-date { font-family: var(--mono); font-size: 10px; color: var(--text3); min-width: 60px; padding-top: 1px; flex-shrink: 0; }
+.deal-note { font-size: 12px; color: var(--text2); margin-top: 12px; padding: 10px 12px; background: var(--bg3); border-radius: 6px; line-height: 1.55; }
+
+/* ── PIPELINE ── */
+.pipe-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+.pill {
+  font-family: var(--mono); font-size: 10px; padding: 3px 8px;
+  border-radius: 3px; letter-spacing: .03em; border: 0.5px solid transparent;
+}
+.pill-won   { background: #e8f5ee; color: #1e7a3a; border-color: #b8ddc8; }
+.pill-prop  { background: #e6eef8; color: #1a5fa8; border-color: #b0c8e8; }
+.pill-demo  { background: #fdf3e3; color: #b8720a; border-color: #e8cfa0; }
+.pill-qsl   { background: #eeebf8; color: #6a4fb8; border-color: #c8bce8; }
+.pill-nego  { background: #e8f5ee; color: #1e7a3a; border-color: #b8ddc8; }
+
+.deal-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0; border-bottom: 0.5px solid var(--border);
+  gap: 8px;
+}
+.deal-row:last-child { border-bottom: none; }
+.deal-name { font-size: 12px; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deal-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.deal-amt { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.stage-tag { font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 3px; }
+
+/* ── SLACK ── */
+.slack-msg { padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.slack-msg:last-child { border-bottom: none; }
+.slack-text { font-size: 12px; color: var(--text2); line-height: 1.55; }
+.slack-time { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+/* ── AR ── */
+.ar-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 0; border-bottom: 0.5px solid var(--border); gap: 8px;
+}
+.ar-row:last-child { border-bottom: none; }
+.ar-client { font-size: 12px; color: var(--text); }
+.ar-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.ar-amt { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.ar-status { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 3px; }
+.ar-ok     { background: #e8f5ee; color: #1e7a3a; }
+.ar-warn   { background: #fdf3e3; color: #b8720a; }
+.ar-urgent { background: #fbeaea; color: var(--red); }
+
+/* ── ACCOUNTS PANEL ── */
+.accounts-panel {
+  margin: 0 28px 0;
+  background: var(--bg2);
+  border: 0.5px dashed var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  transition: border-color .2s;
+}
+.accounts-panel.active { border-color: var(--blue); border-style: solid; }
+.accounts-panel textarea {
+  width: 100%; height: 130px;
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 6px; padding: 10px 12px;
+  font-family: var(--mono); font-size: 12px; color: var(--text2);
+  resize: vertical; outline: none; transition: border-color .15s;
+}
+.accounts-panel textarea:focus { border-color: var(--blue); }
+.accounts-panel textarea::placeholder { color: var(--text3); }
+.acct-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.acct-count { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-left: auto; }
+.acct-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--blue); color: #fff;
+  font-family: var(--mono); font-size: 9px; font-weight: 600;
+  border-radius: 8px; padding: 1px 5px; margin-left: 5px;
+  vertical-align: middle; line-height: 1.4;
+}
+
+/* ── AI INSIGHT ── */
+.insight-body { font-size: 12px; color: var(--text2); line-height: 1.7; }
+.insight-item {
+  display: flex; gap: 8px; padding: 6px 0;
+  border-bottom: 0.5px solid var(--border);
+  align-items: flex-start;
+}
+.insight-item:last-child { border-bottom: none; }
+.insight-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.insight-text { flex: 1; }
+.insight-tag {
+  display: inline-block; font-family: var(--mono); font-size: 9px; font-weight: 600;
+  padding: 1px 5px; border-radius: 4px; margin-right: 5px; vertical-align: middle;
+}
+.tag-urgent { background: #fde8e8; color: var(--red); }
+.tag-focus  { background: #e6eef8; color: #1a5fa8; }
+.tag-watch  { background: #fdf3e3; color: #b8720a; }
+.tag-ok     { background: #e8f5ee; color: #1e7a3a; }
+
+/* ── CALENDAR ── */
+.cal-row {
+  display: flex; gap: 14px; padding: 7px 0;
+  border-bottom: 0.5px solid var(--border); align-items: flex-start;
+}
+.cal-row:last-child { border-bottom: none; }
+.cal-time { font-family: var(--mono); font-size: 10px; color: var(--text3); min-width: 90px; padding-top: 1px; flex-shrink: 0; }
+.cal-title { font-size: 12px; color: var(--text); }
+.cal-loc { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* ── ACTION ITEMS ── */
+.action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.action-card {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 8px; padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.action-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.dot-high   { background: var(--red); }
+.dot-medium { background: var(--amber); }
+.dot-low    { background: var(--text3); }
+.action-mkt  { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-bottom: 3px; letter-spacing: .04em; }
+.action-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* ── QUICK LINKS ── */
+.links-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.link-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 6px; padding: 7px 12px;
+  text-decoration: none; color: var(--text2);
+  font-size: 12px; transition: all .15s; cursor: pointer;
+}
+.link-pill:hover { border-color: var(--blue); color: var(--blue); background: #f0f4fc; }
+.link-icon { font-size: 13px; }
+
+/* ── SLACK DONE ── */
+.slack-section-label {
+  font-family: var(--mono); font-size: 9px; color: var(--text3);
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 6px 0 4px; margin-top: 8px;
+  border-top: 0.5px dashed var(--border2);
+}
+.slack-section-label:first-child { margin-top: 0; border-top: none; }
+.slack-msg.done .slack-text { text-decoration: line-through; color: var(--text3); }
+.slack-msg.done .slack-time { color: var(--border2); }
+
+/* ── AR DONE ── */
+.ar-row.done .ar-client,
+.ar-row.done .ar-amt { text-decoration: line-through; color: var(--text3); }
+.ar-row.done .ar-status { background: var(--bg3); color: var(--text3); }
+
+/* ── EMPTY ── */
+.empty { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 14px 0; text-align: center; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 0.5px solid var(--border2); margin: 20px 0; }
+
+/* ── FOOTER ── */
+.footer { text-align: center; padding: 24px 0 12px; font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .06em; }
+
+/* ── ANIM ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.fade-in { animation: fadeUp .22s ease both; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .kpi-row { grid-template-columns: repeat(4, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .topbar, .main { padding-left: 16px; padding-right: 16px; }
+  .paste-panel { margin-left: 16px; margin-right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">GM <em>Dashboard</em></span>
+    <span class="week-badge" id="week-badge">—</span>
+  </div>
+  <div class="topbar-right">
+    <span class="ts" id="ts">尚未載入</span>
+    <button class="btn lang-btn" id="lang-btn" onclick="toggleLang()">EN</button>
+    <button class="btn" id="acct-btn" onclick="toggleAccounts()">🏢 公司庫<span class="acct-badge" id="acct-badge">0</span></button>
+    <button class="btn" id="paste-btn" onclick="togglePaste()">貼入 JSON</button>
+
+  </div>
+</div>
+
+<div class="accounts-panel" id="accounts-panel" style="display:none; margin-bottom:0;">
+  <div class="paste-label">// 🏢 公司資料庫 — 貼入後永久儲存於本機，不會被週報 JSON 覆蓋</div>
+  <textarea id="accounts-input" placeholder='{"PT Bank Sinarmas": {"bio": {"zh": "...", "en": "..."}, "industry": "Banking", "country": "ID"}, ...}'></textarea>
+  <div class="acct-actions">
+    <button class="btn primary" onclick="saveAccounts()">儲 存</button>
+    <button class="btn" onclick="clearAccountsInput()">清 除</button>
+    <button class="btn" onclick="exportAccounts()">匯 出</button>
+    <span class="acct-count" id="acct-status"></span>
+  </div>
+</div>
+
+<div class="paste-panel" id="paste-panel" style="display:none;">
+  <div class="paste-label">// 貼入 Claude 產生的 JSON，按「渲染」即更新 dashboard</div>
+  <textarea id="json-input" placeholder='{"generated_at": "2026-05-07 17:30", "week": "W19", ...}'></textarea>
+  <div class="paste-actions">
+    <button class="btn primary" data-i18n="render" onclick="renderFromPaste()">渲 染</button>
+    <button class="btn" data-i18n="clear" onclick="clearPaste()">清 除</button>
+    <span class="parse-error" id="parse-error"></span>
+  </div>
+</div>
+
+<div class="main" id="main" style="display:none;">
+
+  <div class="kpi-row fade-in" id="kpi-row"></div>
+
+  <!-- PIPELINE OVERVIEW -->
+  <div class="section fade-in" id="pipe-overview-section" style="margin-top:16px;">
+    <div class="section-hd" style="cursor:pointer;" onclick="toggleOverview()">
+      <span style="font-size:13px;flex-shrink:0;">📊</span>
+      <span class="section-title" id="i18n-pipe-overview">PIPELINE OVERVIEW — 全年佈局</span>
+      <span id="overview-chevron" style="margin-left:auto;font-size:12px;color:var(--text3);transition:transform .2s;">▲</span>
+    </div>
+    <div id="pipe-overview-body">
+      <div class="card" style="overflow-x:auto;">
+        <div id="pipe-overview-table"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ① MY: Pipeline + AI Insight 並排 -->
+  <div class="section fade-in" id="my-section">
+    <div class="section-hd">
+      <div class="mkt-dot dot-my"></div>
+      <span class="section-title" id="i18n-my">MALAYSIA</span>
+      <span class="section-meta" id="my-meta"></span>
+    </div>
+    <div class="two-col">
+      <div class="card"><div class="card-title" id="i18n-pipe-my">PIPELINE — CRM</div><div id="my-pipeline"></div></div>
+      <div class="card" id="my-insight-card" style="display:none;"><div class="card-title" id="i18n-insight-my">🤖 AI 業務建議</div><div id="my-insight"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ② ID: Pipeline + AI Insight 並排 -->
+  <div class="section fade-in">
+    <div class="section-hd">
+      <div class="mkt-dot dot-id"></div>
+      <span class="section-title" id="i18n-id">INDONESIA</span>
+      <span class="section-meta" id="id-meta"></span>
+    </div>
+    <div class="two-col">
+      <div class="card"><div class="card-title" id="i18n-pipe-id">PIPELINE — CRM</div><div id="id-pipeline"></div></div>
+      <div class="card" id="id-insight-card" style="display:none;"><div class="card-title" id="i18n-insight-id">🤖 AI 業務建議</div><div id="id-insight"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ③ TH: Pipeline + AI Insight 並排 -->
+  <div class="section fade-in">
+    <div class="section-hd">
+      <div class="mkt-dot dot-th"></div>
+      <span class="section-title" id="i18n-th">THAILAND</span>
+      <span class="section-meta" id="th-meta"></span>
+    </div>
+    <div class="two-col">
+      <div class="card"><div class="card-title" id="i18n-pipe-th">PIPELINE — CRM</div><div id="th-pipeline"></div></div>
+      <div class="card" id="th-insight-card" style="display:none;"><div class="card-title" id="i18n-insight-th">🤖 AI 業務建議</div><div id="th-insight"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ④ AR (MY/ID/TH) + Xero Invoice 並排 -->
+  <div class="two-col fade-in">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-ar"></div>
+        <span class="section-title" id="i18n-ar">AR / OVERDUE</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card"><div class="card-title" id="i18n-ar-my">MALAYSIA</div><div id="ar-my"></div></div>
+        <div class="card"><div class="card-title" id="i18n-ar-id">INDONESIA</div><div id="ar-id"></div></div>
+        <div class="card"><div class="card-title" id="i18n-ar-th">THAILAND</div><div id="ar-th"></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-size:13px;flex-shrink:0;">📄</span>
+        <span class="section-title" id="i18n-xero">XERO — INVOICES DUE</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card"><div class="card-title">MALAYSIA (MYR)</div><div id="xero-my"></div></div>
+        <div class="card"><div class="card-title">INDONESIA (IDR)</div><div id="xero-id"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ⑤ Action Items -->
+  <div class="section fade-in">
+    <div class="section-hd">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0;"></span>
+      <span class="section-title" id="i18n-act">ACTION ITEMS</span>
+    </div>
+    <div class="action-grid" id="action-grid"></div>
+  </div>
+
+  <!-- ⑥ G-Leaders + Global Allhands 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:var(--text3);">#</span>
+        <span class="section-title" id="i18n-lead">G-LEADERS — LATEST</span>
+      </div>
+      <div class="card"><div id="leaders-content"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:var(--text3);">#</span>
+        <span class="section-title" id="i18n-all">GLOBAL-ALLHANDS</span>
+      </div>
+      <div class="card"><div id="allhands-content"></div></div>
+    </div>
+  </div>
+
+  <!-- ⑦ MY-Team + ID-Team 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-my"></div>
+        <span class="section-title" id="i18n-myteam">#MY-TEAM</span>
+      </div>
+      <div class="card"><div id="my-team-content"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-id"></div>
+        <span class="section-title" id="i18n-idteam">#ID-TEAM</span>
+      </div>
+      <div class="card"><div id="id-team-content"></div></div>
+    </div>
+  </div>
+
+  <!-- ⑧ Ruby + Ranti DM 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-my"></div>
+        <span class="section-title" id="i18n-slack-ruby">RUBY — SLACK DM</span>
+      </div>
+      <div class="card"><div id="my-slack"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-id"></div>
+        <span class="section-title" id="i18n-slack-ranti">RANTI — SLACK DM</span>
+      </div>
+      <div class="card"><div id="id-slack"></div></div>
+    </div>
+  </div>
+
+  <!-- ⑨ Jinger DM + Calendar 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-th"></div>
+        <span class="section-title" id="i18n-slack-jinger">JINGER — SLACK DM</span>
+      </div>
+      <div class="card"><div id="th-slack"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-cal"></div>
+        <span class="section-title" id="i18n-cal">CALENDAR — THIS &amp; NEXT WEEK</span>
+      </div>
+      <div class="card"><div id="cal-content"></div></div>
+    </div>
+
+
+  <!-- LINE 討論記錄 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:#06C755;font-weight:700;">LINE</span>
+        <span class="section-title" id="i18n-line-strategy">塔圖營運策略討論</span>
+      </div>
+      <div class="card"><div id="line-strategy-content"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:#06C755;font-weight:700;">LINE</span>
+        <span class="section-title" id="i18n-line-ops">Tagtoo Global 討論區</span>
+      </div>
+      <div class="card"><div id="line-ops-content"></div></div>
+    </div>
+  </div>
+  <div class="section fade-in" style="margin-top:20px;">
+    <div class="section-hd"><span class="section-title" id="i18n-links">QUICK LINKS</span></div>
+    <div class="links-row">
+      <a class="link-pill" href="https://docs.google.com/spreadsheets/d/1tcaobsbpv61_l--RSM77nn6_84YfBU0Kl-Gg2dw_xxM/edit" target="_blank"><span class="link-icon">📊</span>KPI Dashboard (Weekly)</a>
+      <a class="link-pill" href="https://docs.google.com/spreadsheets/d/1HGj18N7ldrDwyD7sIoIKWO33Z6qHtn_F/view" target="_blank"><span class="link-icon">📁</span>KPI Dashboard.xlsx</a>
+      <a class="link-pill" href="https://drive.google.com/file/d/1MS1EkONFQCVmkm1JBrBql-07TM7GMxAE/view" target="_blank"><span class="link-icon">🐍</span>ETL Script v5</a>
+      <a class="link-pill" href="https://docs.google.com/document/d/1DnzKo3rqZBflLCQqr80vkgF9NTyXy7qfY7mxKCAJaD8/edit" target="_blank"><span class="link-icon">📝</span>SEA Dashboard Handoff</a>
+      <a class="link-pill" href="https://one.zoho.com/zohoone/tagtoo/home/cxapp/crm/org776564636/tab/Reports/5244876000069870106" target="_blank"><span class="link-icon">🔗</span>Zoho CRM Report</a>
+      <a class="link-pill" href="https://one.zoho.com/zohoone/tagtoo/home/cxapp/crm" target="_blank"><span class="link-icon">🏢</span>Zoho CRM</a>
+      <a class="link-pill" href="https://app.slack.com/client/T055KMZEJJ2/C055KMZEJJ2" target="_blank"><span class="link-icon">💬</span>#g-leaders</a>
+      <a class="link-pill" href="https://drive.google.com/drive/folders/1CFOUAlbn7MB3Gv06TZGR0u-EDPuTJ__6" target="_blank"><span class="link-icon">📂</span>Obsidian Vault Drive</a>
+    </div>
+  </div>
+</div>
+
+<div class="deal-overlay" id="deal-overlay" onclick="closeDealPanel(event)">
+  <div class="deal-panel" id="deal-panel">
+    <div class="deal-panel-hd">
+      <div class="deal-panel-name" id="dp-name"></div>
+      <button class="deal-panel-close" onclick="closeDealPanel()">✕</button>
+    </div>
+    <div class="deal-meta-grid" id="dp-meta"></div>
+    <div class="deal-note" id="dp-note" style="display:none;"></div>
+    <div id="dp-bio" style="display:none; font-size:12px; color:var(--text2); line-height:1.6; margin-top:12px; padding:10px 12px; background:var(--bg3); border-radius:6px; border-left:2px solid var(--border2);"></div>
+    <div class="deal-history" id="dp-history" style="display:none;">
+      <div class="deal-history-hd" id="dp-hist-lbl">HISTORY</div>
+      <div id="dp-hist-rows"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">TAGTOO GLOBAL · GM DASHBOARD · LOCAL BUILD</div>
+
+<script>
+/* ══════════════════════════════════════════
+   ACCOUNT DATABASE — localStorage persistent
+══════════════════════════════════════════ */
+let _accountDB = {};
+const ACCT_KEY = 'tagtoo_gm_accounts_v1';
+
+function loadAccountsFromStorage() {
+  try {
+    const raw = localStorage.getItem(ACCT_KEY);
+    if (raw) {
+      _accountDB = JSON.parse(raw);
+      updateAcctBadge();
+    }
+  } catch(e) { console.warn('accounts load failed', e); }
+}
+function updateAcctBadge() {
+  const n = Object.keys(_accountDB).length;
+  const badge = document.getElementById('acct-badge');
+  if (badge) badge.textContent = n;
+}
+function lookupAccount(accountName) {
+  if (!accountName || !Object.keys(_accountDB).length) return null;
+  const key = Object.keys(_accountDB).find(k =>
+    k.toLowerCase() === accountName.toLowerCase() ||
+    accountName.toLowerCase().includes(k.toLowerCase()) ||
+    k.toLowerCase().includes(accountName.toLowerCase())
+  );
+  return key ? _accountDB[key] : null;
+}
+function toggleAccounts() {
+  const p = document.getElementById('accounts-panel');
+  const isHidden = p.style.display === 'none';
+  p.style.display = isHidden ? '' : 'none';
+  if (isHidden) {
+    // pre-fill with current DB so user can see & edit
+    const ta = document.getElementById('accounts-input');
+    if (Object.keys(_accountDB).length) {
+      ta.value = JSON.stringify(_accountDB, null, 2);
+    }
+    updateAcctStatus();
+  }
+}
+function saveAccounts() {
+  const raw = document.getElementById('accounts-input').value.trim();
+  const statusEl = document.getElementById('acct-status');
+  try {
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    _accountDB = parsed;
+    localStorage.setItem(ACCT_KEY, JSON.stringify(parsed));
+    updateAcctBadge();
+    const n = Object.keys(parsed).length;
+    statusEl.textContent = `✓ 已儲存 ${n} 家公司`;
+    statusEl.style.color = 'var(--green)';
+    // re-render pipeline if data loaded, to refresh any open panels
+    if (_lastData) renderAll(_lastData);
+  } catch(e) {
+    statusEl.textContent = '⚠ 解析失敗：' + e.message.slice(0,50);
+    statusEl.style.color = 'var(--red)';
+  }
+}
+function clearAccountsInput() {
+  document.getElementById('accounts-input').value = '';
+  document.getElementById('acct-status').textContent = '';
+}
+function exportAccounts() {
+  const json = JSON.stringify(_accountDB, null, 2);
+  document.getElementById('accounts-input').value = json;
+  document.getElementById('acct-status').textContent = `已匯出 ${Object.keys(_accountDB).length} 家公司至文字框`;
+  document.getElementById('acct-status').style.color = 'var(--text3)';
+}
+function updateAcctStatus() {
+  const n = Object.keys(_accountDB).length;
+  const s = document.getElementById('acct-status');
+  s.textContent = n ? `目前已儲存 ${n} 家公司` : '尚無資料';
+  s.style.color = 'var(--text3)';
+}
+
+/* ══════════════════════════════════════════
+   BILINGUAL FIELD RESOLVER
+   L(field) — reads {zh, en} object OR plain string.
+   Falls back gracefully so old JSON still works.
+══════════════════════════════════════════ */
+function L(field) {
+  if (!field) return '';
+  if (typeof field === 'object') return field[LANG] ?? field.zh ?? field.en ?? '';
+  return String(field);
+}
+
+/* ══════════════════════════════════════════
+   I18N — UI labels only
+══════════════════════════════════════════ */
+let LANG = 'zh';
+const T = {
+  zh: {
+    paste_btn:     '貼入 JSON',
+    sample_btn:    '載入範例',
+    render_btn:    '渲 染',
+    clear_btn:     '清 除',
+    paste_label:   '// 貼入 Claude 產生的 JSON，按「渲染」即更新 dashboard',
+    paste_ph:      '{"generated_at": "2026-05-07 17:30", "week": "W19", ...}',
+    not_loaded:    '尚未載入',
+    active_deals:  n => `${n} 個進行中`,
+    no_deals:      'No active deals',
+    no_msgs:       'No recent messages',
+    no_events:     'No upcoming events',
+    no_actions:    'No action items',
+    cleared:       '清零 ✓',
+    done_label:    '✓ 已完成 (30天內)',
+    list_view:     '列表',
+    timeline_view: '時間軸',
+    close_month:   '預計結案月份',
+    q_label:       q => `Q${q}`,
+    no_close_date: '未填結案日期',
+    dp_stage:      '階段',
+    dp_amount:     '金額',
+    dp_close:      '預計結案',
+    dp_owner:      '負責人',
+    dp_account:    '客戶',
+    dp_industry:   '產業',
+    dp_note:       '備注',
+    dp_history:    '歷史合作',
+    dp_hist_none:  '無歷史紀錄',
+    dp_no_date:    '—',
+    section_my:    'MALAYSIA',
+    section_id:    'INDONESIA',
+    section_th:    'THAILAND',
+    section_ar:    'AR / OVERDUE',
+    section_cal:   'CALENDAR — THIS & NEXT WEEK',
+    section_act:   'ACTION ITEMS',
+    section_lead:  'G-LEADERS — LATEST',
+    section_all:   'GLOBAL-ALLHANDS',
+    section_myteam:'#MY-TEAM',
+    section_idteam:'#ID-TEAM',
+    section_links: 'QUICK LINKS',
+    card_pipeline: 'PIPELINE — CRM',
+    card_ruby:     'RUBY — SLACK DM',
+    card_ranti:    'RANTI — SLACK DM',
+    card_jinger:   'JINGER — SLACK DM',
+    card_ar_my:    'MALAYSIA',
+    card_ar_id:    'INDONESIA',
+    priority_high: 'HIGH',
+    priority_med:  'MED',
+    priority_low:  'LOW',
+  },
+  en: {
+    paste_btn:     'Paste JSON',
+    sample_btn:    'Load Sample',
+    render_btn:    'Render',
+    clear_btn:     'Clear',
+    paste_label:   '// Paste Claude-generated JSON and click Render to update dashboard',
+    paste_ph:      '{"generated_at": "2026-05-07 17:30", "week": "W19", ...}',
+    not_loaded:    'Not loaded',
+    active_deals:  n => `${n} active deals`,
+    no_deals:      'No active deals',
+    no_msgs:       'No recent messages',
+    no_events:     'No upcoming events',
+    no_actions:    'No action items',
+    cleared:       'Cleared ✓',
+    done_label:    '✓ Completed (last 30 days)',
+    list_view:     'List',
+    timeline_view: 'Timeline',
+    close_month:   'Expected close month',
+    q_label:       q => `Q${q}`,
+    no_close_date: 'No close date',
+    dp_stage:      'Stage',
+    dp_amount:     'Amount',
+    dp_close:      'Expected Close',
+    dp_owner:      'Owner',
+    dp_account:    'Account',
+    dp_industry:   'Industry',
+    dp_note:       'Notes',
+    dp_history:    'Past Collaboration',
+    dp_hist_none:  'No history on record',
+    dp_no_date:    '—',
+    section_my:    'MALAYSIA',
+    section_id:    'INDONESIA',
+    section_th:    'THAILAND',
+    section_ar:    'AR / OVERDUE',
+    section_cal:   'CALENDAR — THIS & NEXT WEEK',
+    section_act:   'ACTION ITEMS',
+    section_lead:  'G-LEADERS — LATEST',
+    section_all:   'GLOBAL-ALLHANDS',
+    section_myteam:'#MY-TEAM',
+    section_idteam:'#ID-TEAM',
+    section_links: 'QUICK LINKS',
+    card_pipeline: 'PIPELINE — CRM',
+    card_ruby:     'RUBY — SLACK DM',
+    card_ranti:    'RANTI — SLACK DM',
+    card_jinger:   'JINGER — SLACK DM',
+    card_ar_my:    'MALAYSIA',
+    card_ar_id:    'INDONESIA',
+    priority_high: 'HIGH',
+    priority_med:  'MED',
+    priority_low:  'LOW',
+  }
+};
+function t(key, ...args) {
+  const val = T[LANG][key];
+  return typeof val === 'function' ? val(...args) : (val ?? T.en[key] ?? key);
+}
+function toggleLang() {
+  LANG = LANG === 'zh' ? 'en' : 'zh';
+  const btn = document.getElementById('lang-btn');
+  btn.textContent = LANG === 'zh' ? 'EN' : '中';
+  btn.classList.toggle('active', LANG === 'en');
+  applyI18nStatic();
+  if (_lastData) renderAll(_lastData);
+}
+function applyI18nStatic() {
+  document.getElementById('paste-btn').textContent      = t('paste_btn');
+  document.getElementById('json-input').placeholder     = t('paste_ph');
+  document.querySelector('.paste-label').textContent    = t('paste_label');
+  document.querySelector('[data-i18n="render"]').textContent  = t('render_btn');
+  document.querySelector('[data-i18n="clear"]').textContent   = t('clear_btn');
+  // Section titles
+  const map = {
+    'i18n-my': 'section_my', 'i18n-id': 'section_id', 'i18n-th': 'section_th',
+    'i18n-ar': 'section_ar', 'i18n-cal': 'section_cal', 'i18n-act': 'section_act',
+    'i18n-lead': 'section_lead', 'i18n-all': 'section_all',
+    'i18n-myteam': 'section_myteam', 'i18n-idteam': 'section_idteam',
+    'i18n-links': 'section_links',
+    'i18n-pipe-my': 'card_pipeline', 'i18n-pipe-id': 'card_pipeline', 'i18n-pipe-th': 'card_pipeline',
+    'i18n-slack-ruby': 'card_ruby', 'i18n-slack-ranti': 'card_ranti', 'i18n-slack-jinger': 'card_jinger',
+    'i18n-ar-my': 'card_ar_my', 'i18n-ar-id': 'card_ar_id',
+  };
+  Object.entries(map).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t(key);
+  });
+  if (!document.getElementById('ts').textContent || document.getElementById('ts').textContent === t('not_loaded'))
+    document.getElementById('ts').textContent = t('not_loaded');
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE STATE — per market view mode
+══════════════════════════════════════════ */
+const pipeMode = { MY: 'list', ID: 'list', TH: 'list' };
+let _lastData = null;
+
+/* ══════════════════════════════════════════
+   STAGE HELPERS
+══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   AMOUNT HELPERS — parse & sum pipeline amounts
+══════════════════════════════════════════ */
+function parseAmount(amtStr) {
+  if (!amtStr) return null;
+  const s = String(amtStr).replace(/,/g,'').trim();
+  const m = s.match(/([A-Z]{2,3})\s*([\d.]+)([KMBkmbillion]*)/i);
+  if (!m) return null;
+  const cur = m[1].toUpperCase();
+  let val = parseFloat(m[2]);
+  const suf = m[3].toUpperCase();
+  if (suf === 'K') val *= 1e3;
+  else if (suf === 'M') val *= 1e6;
+  else if (suf === 'B') val *= 1e9;
+  return { cur, val };
+}
+function formatAmount(val, cur) {
+  if (val >= 1e9) return cur + ' ' + (val/1e9).toFixed(1).replace(/\.0$/,'') + 'B';
+  if (val >= 1e6) return cur + ' ' + (val/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (val >= 1e3) return cur + ' ' + (val/1e3).toFixed(0) + 'K';
+  return cur + ' ' + val.toFixed(0);
+}
+function sumAmounts(deals) {
+  const byCur = {};
+  deals.forEach(d => {
+    const p = parseAmount(d.amount);
+    if (!p) return;
+    byCur[p.cur] = (byCur[p.cur]||0) + p.val;
+  });
+  return Object.entries(byCur).map(([c,v]) => formatAmount(v,c)).join(' + ') || null;
+}
+
+function stageClass(s) {
+  if (!s) return 'pill-qsl';
+  const l = s.toLowerCase();
+  if (l.includes('won') || l.includes('verbal')) return 'pill-won';
+  if (l.includes('proposal')) return 'pill-prop';
+  if (l.includes('demo')) return 'pill-demo';
+  if (l.includes('nego') || l.includes('contract') || l.includes('review')) return 'pill-nego';
+  return 'pill-qsl';
+}
+function stageTagStyle(s) {
+  if (!s) return 'background:#eeebf8;color:#6a4fb8;';
+  const l = s.toLowerCase();
+  if (l.includes('won') || l.includes('verbal')) return 'background:#e8f5ee;color:#1e7a3a;';
+  if (l.includes('proposal')) return 'background:#e6eef8;color:#1a5fa8;';
+  if (l.includes('demo')) return 'background:#fdf3e3;color:#b8720a;';
+  if (l.includes('nego') || l.includes('contract') || l.includes('review')) return 'background:#e8f5ee;color:#1e7a3a;';
+  return 'background:#eeebf8;color:#6a4fb8;';
+}
+function stageCounts(deals) {
+  const c = {};
+  deals.forEach(d => { if (d.stage) c[d.stage] = (c[d.stage]||0)+1; });
+  return c;
+}
+
+/* ══════════════════════════════════════════
+   DEAL REGISTRY — avoids inline JSON in onclick
+══════════════════════════════════════════ */
+const _dealRegistry = {};
+let _dealRegIdx = 0;
+function registerDeal(d) {
+  const key = 'deal_' + (_dealRegIdx++);
+  _dealRegistry[key] = d;
+  return key;
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE — LIST VIEW
+══════════════════════════════════════════ */
+function renderPipelineList(deals, containerId, market) {
+  const counts = stageCounts(deals);
+  // Build per-stage deal lists for amount summing
+  const byStage = {};
+  deals.forEach(d => { if (d.stage) { if (!byStage[d.stage]) byStage[d.stage] = []; byStage[d.stage].push(d); }});
+  const pills = Object.entries(counts).map(([s,n]) => {
+    const sum = sumAmounts(byStage[s]||[]);
+    const label = s.replace('Qualified (QSL)','QSL');
+    return `<span class="pill ${stageClass(s)}">${label} ${n}${sum ? ' <span style="opacity:.7;font-weight:400;">'+sum+'</span>' : ''}</span>`;
+  }).join('');
+  // Total across all deals
+  const total = sumAmounts(deals);
+  const totalHtml = total ? `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px;text-align:right;">Total: <strong style="color:var(--text2);">${total}</strong></div>` : '';
+  const rows = deals.slice(0,12).map(d => {
+    const key = registerDeal(d);
+    return `
+    <div class="deal-row clickable" data-deal="${key}" onclick="openDealByKey(this.dataset.deal)">
+      <span class="deal-name">${(d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ')}</span>
+      <div class="deal-right">
+        ${d.amount ? `<span class="deal-amt">${d.amount}</span>` : ''}
+        <span class="stage-tag" style="${stageTagStyle(d.stage)}">${(d.stage||'').replace('Qualified (QSL)','QSL')}</span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="pipe-pills">${pills}</div>${totalHtml}${rows}`;
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE — TIMELINE VIEW
+══════════════════════════════════════════ */
+function parseCloseMonth(closeDate) {
+  // Accepts "2026-Q2", "2026-05", "May 2026", "2026/05", "5/2026", ISO date, etc.
+  if (!closeDate) return null;
+  const s = String(closeDate).trim();
+  // Q notation: "2026-Q2" or "Q2 2026"
+  const qm = s.match(/(\d{4})[^\d]?[Qq](\d)/)||s.match(/[Qq](\d)[^\d]?(\d{4})/);
+  if (qm) {
+    const year = qm[1]?.length===4 ? +qm[1] : +qm[2];
+    const q    = qm[1]?.length===4 ? +qm[2] : +qm[1];
+    return { year, q, month: null };
+  }
+  // ISO-ish: "2026-05" or "2026-05-15" or "2026/05"
+  const iso = s.match(/(\d{4})[-\/](\d{1,2})/);
+  if (iso) {
+    const year = +iso[1], month = +iso[2];
+    const q = Math.ceil(month/3);
+    return { year, q, month };
+  }
+  // "May 2026" or "2026 May"
+  const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const ml = s.toLowerCase();
+  for (let i=0;i<12;i++) {
+    if (ml.includes(MONTHS[i])) {
+      const ym = s.match(/\d{4}/);
+      if (ym) { const year=+ym[0], month=i+1, q=Math.ceil(month/3); return {year,q,month}; }
+    }
+  }
+  return null;
+}
+const MONTH_NAMES_ZH = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const MONTH_NAMES_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function monthName(m) { return LANG==='zh' ? MONTH_NAMES_ZH[m-1] : MONTH_NAMES_EN[m-1]; }
+
+function renderPipelineTimeline(deals) {
+  // Group by quarter → month
+  const byQ = {};
+  const noDate = [];
+  deals.forEach(d => {
+    const cm = parseCloseMonth(d.close_date);
+    if (!cm) { noDate.push(d); return; }
+    const qk = `${cm.year}-Q${cm.q}`;
+    if (!byQ[qk]) byQ[qk] = { year: cm.year, q: cm.q, months: {} };
+    const mk = cm.month || (cm.q * 3); // fallback to last month of quarter
+    if (!byQ[qk].months[mk]) byQ[qk].months[mk] = [];
+    byQ[qk].months[mk].push({ d, cm });
+  });
+
+  const sortedQs = Object.keys(byQ).sort();
+  let html = '';
+
+  sortedQs.forEach(qk => {
+    const { year, q, months } = byQ[qk];
+    html += `<div class="timeline-quarter">
+      <div class="timeline-q-hd">${t('q_label', q)} ${year}</div>`;
+    const sortedMs = Object.keys(months).map(Number).sort((a,b)=>a-b);
+    sortedMs.forEach(mk => {
+      const monthDeals = months[mk].map(({d})=>d);
+      const monthSum = sumAmounts(monthDeals);
+      html += `<div class="timeline-month">
+        <div class="timeline-month-hd">${monthName(mk)}${monthSum ? `<span style="font-family:var(--mono);font-size:10px;font-weight:400;color:var(--text3);margin-left:8px;">${monthSum}</span>` : ''}</div>`;
+      monthDeals.forEach(d => {
+        const key = registerDeal(d);
+        html += `<div class="deal-row clickable" data-deal="${key}" onclick="openDealByKey(this.dataset.deal)">
+          <span class="deal-name">${(d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ')}</span>
+          <div class="deal-right">
+            ${d.amount ? `<span class="deal-amt">${d.amount}</span>` : ''}
+            <span class="stage-tag" style="${stageTagStyle(d.stage)}">${(d.stage||'').replace('Qualified (QSL)','QSL')}</span>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+
+  if (noDate.length) {
+    html += `<div class="timeline-quarter">
+      <div class="timeline-q-hd">${t('no_close_date')}</div>`;
+    noDate.forEach(d => {
+      const key = registerDeal(d);
+      html += `<div class="deal-row clickable" data-deal="${key}" onclick="openDealByKey(this.dataset.deal)">
+        <span class="deal-name">${(d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ')}</span>
+        <div class="deal-right">
+          ${d.amount ? `<span class="deal-amt">${d.amount}</span>` : ''}
+          <span class="stage-tag" style="${stageTagStyle(d.stage)}">${(d.stage||'').replace('Qualified (QSL)','QSL')}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  return html || `<div class="empty">${t('no_deals')}</div>`;
+}
+
+function setPipeMode(market, mode) {
+  pipeMode[market] = mode;
+  const id = market.toLowerCase() + '-pipeline';
+  const deals = (_lastData?.pipeline?.[market])||[];
+  renderPipelineInto(deals, id, market);
+  // update tab active state
+  ['list','timeline'].forEach(m => {
+    const btn = document.getElementById(`ptab-${market}-${m}`);
+    if (btn) btn.classList.toggle('active', m === mode);
+  });
+}
+
+function renderPipelineInto(deals, containerId, market) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!deals?.length) { el.innerHTML = `<div class="empty">${t('no_deals')}</div>`; return; }
+  const toggleHtml = `<div class="pipe-view-toggle">
+    <span class="pipe-tab${pipeMode[market]==='list'?' active':''}" id="ptab-${market}-list" onclick="setPipeMode('${market}','list')">${t('list_view')}</span>
+    <span class="pipe-tab${pipeMode[market]==='timeline'?' active':''}" id="ptab-${market}-timeline" onclick="setPipeMode('${market}','timeline')">${t('timeline_view')}</span>
+  </div>`;
+  const body = pipeMode[market]==='timeline'
+    ? renderPipelineTimeline(deals)
+    : renderPipelineList(deals, containerId, market);
+  el.innerHTML = toggleHtml + body;
+}
+
+/* ══════════════════════════════════════════
+   DEAL DETAIL PANEL
+══════════════════════════════════════════ */
+function openDealPanel(d) {
+  if (!d) return;
+  document.getElementById('dp-name').textContent =
+    (d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ');
+
+  const meta = [
+    [t('dp_stage'),  d.stage ? `<span class="stage-tag" style="${stageTagStyle(d.stage)}">${d.stage}</span>` : '—'],
+    [t('dp_amount'), d.amount ? `<span style="font-family:var(--mono);font-weight:500;">${d.amount}</span>` : '—'],
+    [t('dp_close'),  d.close_date || t('dp_no_date')],
+    [t('dp_owner'),  d.owner || '—'],
+    [t('dp_account'),d.account || '—'],
+    [t('dp_industry'),d.industry || '—'],
+  ];
+  document.getElementById('dp-meta').innerHTML = meta.map(([l,v]) =>
+    `<div class="deal-meta-item"><div class="deal-meta-lbl">${l}</div><div class="deal-meta-val">${v}</div></div>`
+  ).join('');
+
+  const noteEl = document.getElementById('dp-note');
+  if (d.note) { noteEl.textContent = L(d.note); noteEl.style.display = ''; }
+  else noteEl.style.display = 'none';
+
+  // Account bio from _accountDB
+  const bioEl = document.getElementById('dp-bio');
+  const acctInfo = lookupAccount(d.account);
+  if (acctInfo) {
+    const bioText = L(acctInfo.bio || acctInfo);
+    bioEl.textContent = bioText;
+    bioEl.style.display = bioText ? '' : 'none';
+  } else {
+    bioEl.style.display = 'none';
+  }
+
+  const histEl = document.getElementById('dp-history');
+  const histLbl = document.getElementById('dp-hist-lbl');
+  const histRows = document.getElementById('dp-hist-rows');
+  histLbl.textContent = t('dp_history');
+  if (d.history?.length) {
+    histRows.innerHTML = d.history.map(h =>
+      `<div class="deal-hist-row"><div class="deal-hist-date">${h.date||'—'}</div><div>${L(h.desc)}</div></div>`
+    ).join('');
+    histEl.style.display = '';
+  } else if (d.account) {
+    histRows.innerHTML = `<div style="font-size:12px;color:var(--text3);padding:6px 0;">${t('dp_hist_none')}</div>`;
+    histEl.style.display = '';
+  } else {
+    histEl.style.display = 'none';
+  }
+
+  document.getElementById('deal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function openDealByKey(key) {
+  const d = _dealRegistry[key];
+  if (!d) return;
+  openDealPanel(d);
+}
+function closeDealPanel(e) {
+  if (e && e.target !== document.getElementById('deal-overlay')) return;
+  document.getElementById('deal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════════
+   SLACK
+══════════════════════════════════════════ */
+function renderSlack(msgs, id) {
+  if (!msgs?.length) { document.getElementById(id).innerHTML = `<div class="empty">${t('no_msgs')}</div>`; return; }
+  const active = msgs.filter(m => !m.done);
+  const done   = msgs.filter(m => m.done);
+  const mkMsg  = m => `
+    <div class="slack-msg${m.done?' done':''}">
+      <div class="slack-text">${L(m.text).slice(0,180)}${L(m.text).length>180?'…':''}</div>
+      <div class="slack-time">${m.time||''}</div>
+    </div>`;
+  let html = active.slice(0,5).map(mkMsg).join('');
+  if (done.length) {
+    html += `<div class="slack-section-label">${t('done_label')}</div>`;
+    html += done.slice(0,3).map(mkMsg).join('');
+  }
+  document.getElementById(id).innerHTML = html;
+}
+
+/* ══════════════════════════════════════════
+   AI INSIGHTS
+══════════════════════════════════════════ */
+function renderInsight(insight, bodyId, cardId) {
+  const card = document.getElementById(cardId);
+  const body = document.getElementById(bodyId);
+  if (!body || !card) return;
+  // Always show the card so pipeline doesn't stretch to full width
+  card.style.display = '';
+  if (!insight) {
+    body.innerHTML = `<div class="empty" style="color:var(--text3);font-size:11px;">${LANG==='zh'?'本週無 AI 建議（JSON 未包含 ai_insights）':'No AI insights this week (ai_insights not in JSON)'}</div>`;
+    return;
+  }
+  const items = Array.isArray(insight) ? insight : (insight.items || []);
+  if (!items.length) {
+    body.innerHTML = `<div class="empty" style="color:var(--text3);font-size:11px;">${LANG==='zh'?'本週無 AI 建議':'No AI insights this week'}</div>`;
+    return;
+  }
+  const tagMap = {
+    urgent: '<span class="insight-tag tag-urgent">緊急</span>',
+    focus:  '<span class="insight-tag tag-focus">重點</span>',
+    watch:  '<span class="insight-tag tag-watch">留意</span>',
+    ok:     '<span class="insight-tag tag-ok">穩定</span>',
+  };
+  const tagMapEn = {
+    urgent: '<span class="insight-tag tag-urgent">URGENT</span>',
+    focus:  '<span class="insight-tag tag-focus">FOCUS</span>',
+    watch:  '<span class="insight-tag tag-watch">WATCH</span>',
+    ok:     '<span class="insight-tag tag-ok">OK</span>',
+  };
+  const iconMap = { urgent:'🚨', focus:'🎯', watch:'👀', ok:'✅', default:'💡' };
+  const tmap = LANG === 'zh' ? tagMap : tagMapEn;
+  body.innerHTML = '<div class="insight-body">' + items.map(item => {
+    const type = item.type || 'default';
+    const icon = iconMap[type] || iconMap.default;
+    const tag = tmap[type] || '';
+    const text = L(item.text || item);
+    return `<div class="insight-item"><span class="insight-icon">${icon}</span><span class="insight-text">${tag}${text}</span></div>`;
+  }).join('') + '</div>';
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE OVERVIEW
+══════════════════════════════════════════ */
+let _overviewOpen = true;
+function toggleOverview() {
+  _overviewOpen = !_overviewOpen;
+  document.getElementById('pipe-overview-body').style.display = _overviewOpen ? '' : 'none';
+  document.getElementById('overview-chevron').style.transform = _overviewOpen ? '' : 'rotate(180deg)';
+}
+
+function renderOverview(pipeline) {
+  const el = document.getElementById('pipe-overview-table');
+  if (!el) return;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const markets = ['MY','ID','TH'];
+  const labels = {MY:'🇲🇾 MY', ID:'🇮🇩 ID', TH:'🇹🇭 TH'};
+
+  // Global Sales Layout: Proposal Sent and above
+  const HIGH_STAGES = ['proposal sent','negotiation / review','verbal committed','contract send','closed won'];
+
+  // NTD conversion rates
+  const toNTD = (num, upper) => {
+    if (/IDR/.test(upper)) return num / 527;
+    if (/MYR/.test(upper)) return num * 7.96;
+    if (/THB/.test(upper)) return num * 0.88;
+    return num; // already TWD/NTD
+  };
+
+  // Build month→market→total map from pipeline deals (high stage only)
+  const grid = {};
+  markets.forEach(m => { grid[m] = {}; months.forEach(mo => { grid[m][mo] = 0; }); });
+
+  markets.forEach(mk => {
+    const deals = (pipeline||{})[mk] || [];
+    deals.forEach(d => {
+      if (!d.close_date || !d.amount) return;
+      // Filter: Proposal Sent and above (Global Sales Layout order)
+      const stageKey = (d.stage||'').toLowerCase().trim();
+      if (!HIGH_STAGES.includes(stageKey)) return;
+
+      // Parse amount
+      const upper = String(d.amount).toUpperCase();
+      const raw = String(d.amount).replace(/[^0-9.]/g,'');
+      let num = parseFloat(raw) || 0;
+      if (/\dB\b/.test(upper)) num *= 1000000000;
+      else if (/\dM\b/.test(upper)) {
+        if (/IDR/.test(upper)) num *= 1000000;
+        else if (/THB/.test(upper)) num *= 1000000;
+        else if (/MYR/.test(upper)) num *= 1000000;
+        else num *= 1000000;
+      } else if (/\dK\b/.test(upper)) num *= 1000;
+
+      const ntd = toNTD(num, upper);
+
+      // Map close_date → month label
+      const cd = String(d.close_date);
+      let mo = null;
+      if (/Q1/i.test(cd)) mo = 'Mar';
+      else if (/Q2/i.test(cd)) mo = 'Jun';
+      else if (/Q3/i.test(cd)) mo = 'Sep';
+      else if (/Q4/i.test(cd)) mo = 'Dec';
+      else {
+        const m2 = cd.match(/\d{4}-(\d{2})/);
+        if (m2) mo = months[parseInt(m2[1])-1];
+        else mo = months.find(m => cd.includes(m)) || null;
+      }
+      if (mo && grid[mk][mo] !== undefined) grid[mk][mo] += ntd;
+    });
+  });
+
+  // Format helper
+  const fmt = v => {
+    if (!v) return '<span style="color:var(--text3);">—</span>';
+    if (v >= 1000000) return `<span style="color:var(--green-accent,#22c55e);font-weight:600;">${(v/1000000).toFixed(1)}M</span>`;
+    if (v >= 1000) return `${(v/1000).toFixed(0)}K`;
+    return Math.round(v).toLocaleString();
+  };
+
+  // Totals
+  const rowTotal = mk => Object.values(grid[mk]).reduce((a,b)=>a+b,0);
+  const colTotal = mo => markets.reduce((a,mk)=>a+grid[mk][mo],0);
+  const grandTotal = markets.reduce((a,mk)=>a+rowTotal(mk),0);
+
+  const thStyle = 'padding:5px 8px;font-size:10px;color:var(--text3);font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border);';
+  const tdStyle = 'padding:5px 8px;font-size:11px;text-align:right;white-space:nowrap;';
+  const tdLbl  = 'padding:5px 8px;font-size:11px;font-weight:600;white-space:nowrap;';
+
+  let html = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${LANG==='zh'?'Proposal Sent 以上階段（Global Sales Layout）· 單位：NTD 估算（IDR÷527 / MYR×7.96 / THB×0.88）':'Proposal Sent and above (Global Sales Layout) · Unit: NTD est. (IDR÷527 / MYR×7.96 / THB×0.88)'}</div>`;
+  html += `<table style="width:100%;border-collapse:collapse;min-width:760px;">`;
+  html += `<tr><th style="${thStyle}text-align:left;">${LANG==='zh'?'市場':'Market'}</th>`;
+  months.forEach(m => { html += `<th style="${thStyle}">${m}</th>`; });
+  html += `<th style="${thStyle}color:var(--fg);">${LANG==='zh'?'合計':'Total'}</th></tr>`;
+
+  const dotMap = {MY:'dot-my', ID:'dot-id', TH:'dot-th'};
+  markets.forEach(mk => {
+    const hasData = rowTotal(mk) > 0;
+    html += `<tr style="border-top:1px solid var(--border);">`;
+    html += `<td style="${tdLbl}"><span class="mkt-dot ${dotMap[mk]}" style="display:inline-block;"></span>${labels[mk]}</td>`;
+    months.forEach(m => { html += `<td style="${tdStyle}">${fmt(grid[mk][m])}</td>`; });
+    html += `<td style="${tdStyle}font-weight:700;">${hasData ? fmt(rowTotal(mk)) : '<span style="color:var(--text3);">—</span>'}</td>`;
+    html += `</tr>`;
+  });
+
+  // SEA Total row
+  html += `<tr style="border-top:2px solid var(--border);background:var(--bg2,rgba(255,255,255,.04));">`;
+  html += `<td style="${tdLbl}color:var(--fg);">🌏 SEA</td>`;
+  months.forEach(m => { html += `<td style="${tdStyle}font-weight:600;">${fmt(colTotal(m))}</td>`; });
+  html += `<td style="${tdStyle}font-weight:700;color:var(--accent);">${fmt(grandTotal)}</td>`;
+  html += `</tr></table>`;
+
+  el.innerHTML = html;
+}
+function renderXero(invoices, id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!invoices?.length) { el.innerHTML = `<div class="empty" style="color:var(--text3);">—</div>`; return; }
+  // Sort by due date
+  const sorted = [...invoices].sort((a,b) => (a.due||'').localeCompare(b.due||''));
+  el.innerHTML = sorted.map(inv => {
+    const overdue = inv.overdue;
+    const cls = overdue ? 'ar-urgent' : 'ar-warn';
+    return `<div class="ar-row">
+      <span class="ar-client" style="font-size:11px;">${inv.contact}</span>
+      <div class="ar-right">
+        <span class="ar-amt">${inv.amount}</span>
+        <span class="ar-status ${cls}" style="font-size:9px;">${inv.due||'—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderAR(items, id) {
+  if (!items?.length) { document.getElementById(id).innerHTML = `<div class="empty" style="color:#1e7a3a;">${t('cleared')}</div>`; return; }
+  document.getElementById(id).innerHTML = items.map(i => {
+    const isDone = !!i.done;
+    const statusStr = L(i.status);
+    const cls = isDone ? '' : statusStr.includes('已付款') || statusStr.toLowerCase().includes('paid') ? 'ar-ok' : i.urgent ? 'ar-urgent' : 'ar-warn';
+    return `<div class="ar-row${isDone?' done':''}">
+      <span class="ar-client">${L(i.client)}</span>
+      <div class="ar-right">
+        <span class="ar-amt">${i.amount||''}</span>
+        <span class="ar-status ${cls}">${statusStr}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   CALENDAR / ACTIONS / KPI
+══════════════════════════════════════════ */
+function renderCal(events, id) {
+  if (!events?.length) { document.getElementById(id).innerHTML = `<div class="empty">${t('no_events')}</div>`; return; }
+  document.getElementById(id).innerHTML = events.slice(0,10).map(e => `
+    <div class="cal-row">
+      <div class="cal-time">${e.date||''}<br>${e.time||''}</div>
+      <div><div class="cal-title">${L(e.title)}</div>${e.location?`<div class="cal-loc">${L(e.location)}</div>`:''}</div>
+    </div>`).join('');
+}
+function renderActions(items, id) {
+  if (!items?.length) { document.getElementById(id).innerHTML = `<div class="empty">${t('no_actions')}</div>`; return; }
+  document.getElementById(id).innerHTML = items.map(i => {
+    const dc = i.priority==='high'?'dot-high':i.priority==='medium'?'dot-medium':'dot-low';
+    return `<div class="action-card">
+      <div class="action-dot ${dc}"></div>
+      <div><div class="action-mkt">${i.market||'ALL'}</div><div class="action-text">${L(i.item)}</div></div>
+    </div>`;
+  }).join('');
+}
+function renderKPI(kpi, week) {
+  if (!kpi) return;
+  const rate = r => { const n=parseFloat(r); return n>=80?'good':n>=50?'':'warn'; };
+  // kpi_sub: show vs string + a dim label if the vs string doesn't already say month/quarter
+  const sub = (vs, dim) => {
+    if (!vs) return dim ? `<span style="color:var(--text3);font-size:9px;">${dim}</span>` : '';
+    return `${vs}${dim ? `<br><span style="color:var(--text3);font-size:9px;">${dim}</span>` : ''}`;
+  };
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-lbl">MY + TH — KPI</div>
+      <div class="kpi-val ${rate(kpi.my_th_rate)}">${kpi.my_th_rate||'—'}</div>
+      <div class="kpi-sub">${sub(kpi.my_th_vs, kpi.my_th_dim||'')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">INDONESIA — KPI</div>
+      <div class="kpi-val ${rate(kpi.id_rate)}">${kpi.id_rate||'—'}</div>
+      <div class="kpi-sub">${sub(kpi.id_vs, kpi.id_dim||'')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">THAILAND — KPI</div>
+      <div class="kpi-val ${rate(kpi.th_rate)}">${kpi.th_rate||'—'}</div>
+      <div class="kpi-sub">${sub(kpi.th_vs, kpi.th_dim||'')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">MY — LEADS</div>
+      <div class="kpi-val">${kpi.my_leads||'—'}</div>
+      <div class="kpi-sub" style="font-size:10px;line-height:1.6;">${(kpi.my_leads_stages||[]).map(s=>`${s.stage} <b>${s.count}</b>`).join(' · ')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">ID — LEADS</div>
+      <div class="kpi-val">${kpi.id_leads||'—'}</div>
+      <div class="kpi-sub" style="font-size:10px;line-height:1.6;">${(kpi.id_leads_stages||[]).map(s=>`${s.stage} <b>${s.count}</b>`).join(' · ')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">TH — LEADS</div>
+      <div class="kpi-val">${kpi.th_leads||'—'}</div>
+      <div class="kpi-sub" style="font-size:10px;line-height:1.6;">${(kpi.th_leads_stages||[]).map(s=>`${s.stage} <b>${s.count}</b>`).join(' · ')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">WEEK</div>
+      <div class="kpi-val" style="font-size:28px;">${week||'—'}</div>
+      <div class="kpi-sub">${L(kpi.note)||''}</div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   RENDER ALL
+══════════════════════════════════════════ */
+function renderAll(d) {
+  _lastData = d;
+  _dealRegIdx = 0;
+  Object.keys(_dealRegistry).forEach(k => delete _dealRegistry[k]);
+  // accounts come from localStorage only — not from weekly JSON
+  document.getElementById('main').style.display = '';
+  document.getElementById('week-badge').textContent = d.week||'—';
+  document.getElementById('ts').textContent = d.generated_at||'';
+  renderKPI(d.kpi, d.week);
+  const p = d.pipeline||{};
+  renderPipelineInto(p.MY||[], 'my-pipeline', 'MY');
+  renderPipelineInto(p.ID||[], 'id-pipeline', 'ID');
+  renderPipelineInto(p.TH||[], 'th-pipeline', 'TH');
+  const sl = d.slack_highlights||{};
+  renderSlack(sl.ruby||[], 'my-slack');
+  renderSlack(sl.ranti||[], 'id-slack');
+  renderSlack(sl.jinger||[], 'th-slack');
+  renderSlack(sl.leaders||[], 'leaders-content');
+  renderSlack(sl.allhands||[], 'allhands-content');
+  renderSlack(sl.my_team||[], 'my-team-content');
+  renderSlack(sl.id_team||[], 'id-team-content');
+  renderSlack(sl.line_strategy||[], 'line-strategy-content');
+  renderSlack(sl.line_ops||[], 'line-ops-content');
+  const ai = d.ai_insights||{};
+  renderInsight(ai.MY, 'my-insight', 'my-insight-card');
+  renderInsight(ai.ID, 'id-insight', 'id-insight-card');
+  renderInsight(ai.TH, 'th-insight', 'th-insight-card');
+  renderOverview(d.pipeline);
+  const ar = d.ar||{};
+  renderAR(ar.MY||[], 'ar-my');
+  renderAR(ar.ID||[], 'ar-id');
+  renderAR(ar.TH||[], 'ar-th');
+  const xero = d.xero||{};
+  renderXero(xero.MY||[], 'xero-my');
+  renderXero(xero.ID||[], 'xero-id');
+  renderCal(d.calendar||[], 'cal-content');
+  renderActions(d.action_items||[], 'action-grid');
+  const active = arr => (arr||[]).filter(x=>!x.stage?.includes('Lost')&&!x.stage?.includes('Won')).length;
+  document.getElementById('my-meta').textContent = t('active_deals', active(p.MY));
+  document.getElementById('id-meta').textContent = t('active_deals', active(p.ID));
+  document.getElementById('th-meta').textContent = t('active_deals', active(p.TH));
+}
+
+/* ══════════════════════════════════════════
+   UI ACTIONS
+══════════════════════════════════════════ */
+function togglePaste() {
+  const p = document.getElementById('paste-panel');
+  p.style.display = p.style.display==='none' ? '' : 'none';
+}
+function renderFromPaste() {
+  const raw = document.getElementById('json-input').value.trim();
+  document.getElementById('parse-error').textContent = '';
+  try {
+    const d = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderAll(d);
+    document.getElementById('paste-panel').style.display = 'none';
+  } catch(e) {
+    document.getElementById('parse-error').textContent = '⚠ ' + e.message.slice(0,60);
+  }
+}
+function clearPaste() {
+  document.getElementById('json-input').value = '';
+  document.getElementById('parse-error').textContent = '';
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadAccountsFromStorage();
+  const ta = document.getElementById('json-input');
+  if (ta) {
+    ta.addEventListener('focus', () => document.getElementById('paste-panel').classList.add('active'));
+    ta.addEventListener('blur',  () => document.getElementById('paste-panel').classList.remove('active'));
+  }
+  // ESC to close deal panel
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { document.getElementById('deal-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+  });
+});
+</script>
+</body>
+</html>
