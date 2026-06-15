@@ -1380,8 +1380,8 @@ function renderOverview(pipeline) {
   const markets = ['MY','ID','TH'];
   const labels = {MY:'🇲🇾 MY', ID:'🇮🇩 ID', TH:'🇹🇭 TH'};
 
-  // Global Sales Layout: Proposal Sent and above
-  const HIGH_STAGES = ['proposal sent','negotiation / review','verbal committed','contract send','closed won'];
+  // Closed Won only
+  const HIGH_STAGES = ['closed won'];
 
   // NTD conversion rates
   const toNTD = (num, upper) => {
@@ -1399,7 +1399,7 @@ function renderOverview(pipeline) {
     const deals = (pipeline||{})[mk] || [];
     deals.forEach(d => {
       if (!d.close_date || !d.amount) return;
-      // Filter: Proposal Sent and above (Global Sales Layout order)
+      // Filter: Closed Won only
       const stageKey = (d.stage||'').toLowerCase().trim();
       if (!HIGH_STAGES.includes(stageKey)) return;
 
@@ -1450,7 +1450,7 @@ function renderOverview(pipeline) {
   const tdStyle = 'padding:5px 8px;font-size:11px;text-align:right;white-space:nowrap;';
   const tdLbl  = 'padding:5px 8px;font-size:11px;font-weight:600;white-space:nowrap;';
 
-  let html = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${LANG==='zh'?'Proposal Sent 以上階段（Global Sales Layout）· 單位：NTD 估算（IDR÷527 / MYR×7.96 / THB×0.88）':'Proposal Sent and above (Global Sales Layout) · Unit: NTD est. (IDR÷527 / MYR×7.96 / THB×0.88)'}</div>`;
+  let html = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${LANG==='zh'?'Closed Won · 單位：NTD 估算（IDR÷527 / MYR×7.96 / THB×0.88）':'Closed Won · Unit: NTD est. (IDR÷527 / MYR×7.96 / THB×0.88)'}</div>`;
   html += `<table style="width:100%;border-collapse:collapse;min-width:760px;">`;
   html += `<tr><th style="${thStyle}text-align:left;">${LANG==='zh'?'市場':'Market'}</th>`;
   months.forEach(m => { html += `<th style="${thStyle}">${m}</th>`; });
