@@ -1694,7 +1694,8 @@ fetch('clients.json')
   .then(r => r.json())
   .then(data => {
     CM_CLIENTS = data;
-      const b = document.getElementById('cm-n-all');
+    buildClientMaster();
+    const b = document.getElementById('cm-n-all');
     if (b) b.textContent = CM_CLIENTS.length;
     const s = document.getElementById('cm-stats');
     if (s) s.textContent = '顯示 ' + CM_CLIENTS.length + ' / ' + CM_CLIENTS.length + ' 間公司';
