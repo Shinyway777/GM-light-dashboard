@@ -1718,29 +1718,49 @@ function buildWeeklyHistoryMenu() {
 }
 
 function showWeeklyHistoryPanel(weekKeys) {
-  let panel = document.getElementById('weekly-history-panel');
-  if (panel) { panel.remove(); return; }
+  const existing = document.getElementById('weekly-history-panel');
+  if (existing) { existing.remove(); return; }
 
-  panel = document.createElement('div');
+  const panel = document.createElement('div');
   panel.id = 'weekly-history-panel';
-  panel.style.cssText = 'position:fixed;top:50px;left:50%;transform:translateX(-50%);background:#1a2a3a;border:1px solid #2a3a4a;border-radius:12px;padding:16px;z-index:9998;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+  panel.style.cssText = 'position:fixed;top:50px;left:50%;transform:translateX(-50%);' +
+    'background:#1a2a3a;border:1px solid #2a3a4a;border-radius:12px;padding:16px;' +
+    'z-index:9998;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.5);';
 
-  let inner = '<div style="color:#e2e8f0;font-size:13px;font-weight:700;margin-bottom:12px;">📋 歷史週報 <span onclick="document.getElementById('weekly-history-panel').remove()" style="float:right;cursor:pointer;opacity:.6;font-weight:400;">✕</span></div>';
+  // Header
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'color:#e2e8f0;font-size:13px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
+  hdr.textContent = '📋 歷史週報';
+  const closeBtn = document.createElement('span');
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = 'cursor:pointer;opacity:.6;font-weight:400;font-size:13px;';
+  closeBtn.onclick = function() { panel.remove(); };
+  hdr.appendChild(closeBtn);
+  panel.appendChild(hdr);
 
-  for (const key of weekKeys.slice(0, 12)) {
+  // Week rows
+  weekKeys.slice(0, 12).forEach(function(key) {
     const weekLabel = key.replace('weekly_', '');
-    inner += `<div style="padding:8px 10px;border-radius:6px;cursor:pointer;color:#94a3b8;font-size:12px;margin-bottom:4px;border:1px solid #2a3a4a;"
-      onmouseover="this.style.background='#243040'" onmouseout="this.style.background=''"
-      onclick="loadWeekFromStorage('${key}');document.getElementById('weekly-history-panel').remove()">
-      📅 ${weekLabel}
-    </div>`;
-  }
+    const row = document.createElement('div');
+    row.style.cssText = 'padding:8px 10px;border-radius:6px;cursor:pointer;color:#94a3b8;' +
+      'font-size:12px;margin-bottom:4px;border:1px solid #2a3a4a;';
+    row.textContent = '📅 ' + weekLabel;
+    row.onmouseover = function() { this.style.background = '#243040'; };
+    row.onmouseout  = function() { this.style.background = ''; };
+    row.onclick = function() { loadWeekFromStorage(key); panel.remove(); };
+    panel.appendChild(row);
+  });
 
-  inner += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #2a3a4a;">
-    <button onclick="clearAllWeeklyStorage()" style="font-size:11px;color:#fc8181;background:none;border:none;cursor:pointer;padding:0;">🗑 清除所有本地週報</button>
-  </div>`;
+  // Footer
+  const footer = document.createElement('div');
+  footer.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #2a3a4a;';
+  const delBtn = document.createElement('button');
+  delBtn.textContent = '🗑 清除所有本地週報';
+  delBtn.style.cssText = 'font-size:11px;color:#fc8181;background:none;border:none;cursor:pointer;padding:0;';
+  delBtn.onclick = function() { clearAllWeeklyStorage(); panel.remove(); };
+  footer.appendChild(delBtn);
+  panel.appendChild(footer);
 
-  panel.innerHTML = inner;
   document.body.appendChild(panel);
 }
 
@@ -1772,9 +1792,6 @@ document.addEventListener('DOMContentLoaded', () => {
   vponInit();
   cmGo();
 
-  // ── Load last saved weekly JSON from storage ──
-  loadLatestWeeklyFromStorage();
-  buildWeeklyHistoryMenu();
   const ta = document.getElementById('json-input');
   if (ta) {
     ta.addEventListener('focus', () => document.getElementById('paste-panel').classList.add('active'));
@@ -2176,6 +2193,29 @@ function buildClientMaster() {
   });
   container.innerHTML = html;
 }
+
+// ── Auto-load last saved weekly JSON on page start ──
+(function() {
+  try {
+    const raw = localStorage.getItem('tagtoo_gm_weekly_latest');
+    if (raw) {
+      const d = JSON.parse(raw);
+      // Wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          renderAll(d);
+          showStorageBadge('📂 已讀取 ' + (d.week||'') + ' (本地端)');
+          buildWeeklyHistoryMenu();
+        });
+      } else {
+        renderAll(d);
+        showStorageBadge('📂 已讀取 ' + (d.week||'') + ' (本地端)');
+        buildWeeklyHistoryMenu();
+      }
+    }
+  } catch(e) {}
+})();
+
 </script>
 
 <!-- CLIENT MASTER PAGE -->
