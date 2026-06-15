@@ -458,69 +458,46 @@ body {
 .cm-val.notes { color: var(--text2); font-weight: 400; font-style: italic; }
 .cm-hidden { display: none !important; }
 
-/* ── VPON PIPELINE SECTION ── */
-.vpon-bu-tabs { display:flex; gap:5px; margin-bottom:12px; flex-wrap:wrap; }
-.vpon-bu-tab {
-  font-family:var(--mono); font-size:11px; font-weight:600;
-  padding:5px 16px; border-radius:5px;
-  border:0.5px solid var(--border2);
-  background:var(--bg3); color:var(--text3);
-  cursor:pointer; transition:all .12s; letter-spacing:.03em;
-}
-.vpon-bu-tab:hover { color:var(--text2); }
-.vpon-bu-tab.active.tab-all { background:#1a1a18; color:#f7f6f2; border-color:#1a1a18; }
-.vpon-bu-tab.active.tab-my  { background:#1B5E20; color:#fff; border-color:#1B5E20; }
-.vpon-bu-tab.active.tab-id  { background:#7B3F00; color:#fff; border-color:#7B3F00; }
-.vpon-bu-tab.active.tab-th  { background:#1A237E; color:#fff; border-color:#1A237E; }
-
-/* Timeline scroll */
-.vpon-tl-wrap { overflow-x:auto; padding-bottom:4px; }
-.vpon-tl-row { display:flex; gap:6px; align-items:flex-end; padding:6px 0 2px; min-width:600px; }
-.vpon-tl-month { display:flex; flex-direction:column; align-items:center; min-width:72px; gap:2px; cursor:pointer; border-radius:5px; padding:4px 2px; transition:background .12s; }
-.vpon-tl-month:hover { background:var(--bg3); }
-.vpon-tl-month.tl-active { background:var(--bg3); outline:1.5px solid var(--border2); }
-.vpon-tl-bars { display:flex; align-items:flex-end; width:44px; justify-content:center; }
-.vpon-tl-stack { width:36px; border-radius:3px 3px 0 0; overflow:hidden; display:flex; flex-direction:column-reverse; min-height:4px; }
-.vpon-tl-lbl { font-family:var(--mono); font-size:10px; color:var(--text3); margin-top:3px; }
-.vpon-tl-amt { font-family:var(--mono); font-size:11px; color:var(--text); font-weight:600; }
-.vpon-tl-stage-breakdown { font-size:9px; line-height:1.5; text-align:center; }
-
-/* Grid */
-.vpon-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
-.vpon-month-col { background:var(--bg2); border:0.5px solid var(--border2); border-radius:10px; overflow:hidden; }
-.vpon-month-hd {
-  padding:10px 14px 8px;
-  background:var(--bg3); border-bottom:0.5px solid var(--border2);
-  display:flex; justify-content:space-between; align-items:baseline;
-}
-.vpon-month-label { font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); }
-.vpon-month-total { font-family:var(--mono); font-size:11px; color:var(--text3); }
-
-.vpon-stage-block { padding:8px 12px 6px; border-bottom:0.5px solid var(--border); margin:0 2px; }
-.vpon-stage-block:last-child { border-bottom:none; }
-.vpon-stage-hd { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
-.vpon-stage-label { font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; }
-.vpon-stage-usd { font-family:var(--mono); font-size:10px; font-weight:700; }
-
-.vpon-deal { padding:4px 0; border-top:0.5px solid var(--border); cursor:pointer; border-radius:3px; transition:background .1s; }
-.vpon-deal:first-child { border-top:none; }
-.vpon-deal:hover { background:var(--bg3); }
-.vpon-deal-row1 { display:flex; justify-content:space-between; align-items:flex-start; gap:4px; }
-.vpon-deal-name { font-size:10.5px; color:var(--text); line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:148px; flex:1; }
-.vpon-deal-usd { font-family:var(--mono); font-size:10px; color:var(--text3); white-space:nowrap; flex-shrink:0; }
-.vpon-deal-tags { display:flex; gap:3px; flex-wrap:wrap; margin-top:2px; }
-.vpon-tag { font-size:8px; padding:1px 4px; border-radius:3px; font-family:var(--mono); white-space:nowrap; }
-.vpon-io-y { background:#e8f5ee; color:#1e7a3a; }
-.vpon-io-n { background:#fde8e8; color:#c0392b; }
-.vpon-fix  { background:#fdf3e3; color:#b8720a; }
-.vpon-crm  { background:var(--bg3); color:var(--text3); border:0.5px solid var(--border); }
-.vpon-curr { background:#e6eef8; color:#1a5fa8; }
-.vpon-bu-badge { background:#f0f0ee; color:#555; font-size:8px; padding:1px 4px; border-radius:3px; font-family:var(--mono); }
-
-/* Deal panel extension */
-.dp-vpon-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
-.dp-vpon-tag { font-size:10px; padding:2px 8px; border-radius:4px; font-family:var(--mono); }
-
+.vpon-bu-tabs{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap;}
+.vpon-bu-tab{font-family:var(--mono);font-size:11px;font-weight:600;padding:5px 16px;border-radius:5px;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all .12s;}
+.vpon-bu-tab:hover{color:var(--text2);}
+.vpon-bu-tab.active.tab-all{background:#1a1a18;color:#f7f6f2;border-color:#1a1a18;}
+.vpon-bu-tab.active.tab-my{background:#1B5E20;color:#fff;border-color:#1B5E20;}
+.vpon-bu-tab.active.tab-id{background:#7B3F00;color:#fff;border-color:#7B3F00;}
+.vpon-bu-tab.active.tab-th{background:#1A237E;color:#fff;border-color:#1A237E;}
+.vpon-tl-wrap{overflow-x:auto;padding-bottom:4px;}
+.vpon-tl-row{display:flex;gap:6px;align-items:flex-end;padding:6px 0 2px;min-width:560px;}
+.vpon-tl-month{display:flex;flex-direction:column;align-items:center;min-width:66px;gap:2px;cursor:pointer;border-radius:5px;padding:4px 2px;transition:background .12s;}
+.vpon-tl-month:hover,.vpon-tl-month.tl-active{background:var(--bg3);}
+.vpon-tl-month.tl-active{outline:1.5px solid var(--border2);}
+.vpon-tl-bars{display:flex;align-items:flex-end;width:44px;justify-content:center;}
+.vpon-tl-stack{width:36px;border-radius:3px 3px 0 0;overflow:hidden;display:flex;flex-direction:column-reverse;min-height:4px;}
+.vpon-tl-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:3px;}
+.vpon-tl-amt{font-family:var(--mono);font-size:11px;color:var(--text);font-weight:600;}
+.vpon-tl-sb{font-size:9px;line-height:1.5;text-align:center;}
+.vpon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
+.vpon-month-col{background:var(--bg2);border:0.5px solid var(--border2);border-radius:10px;overflow:hidden;}
+.vpon-month-hd{padding:10px 14px 8px;background:var(--bg3);border-bottom:0.5px solid var(--border2);display:flex;justify-content:space-between;align-items:baseline;}
+.vpon-month-label{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);}
+.vpon-month-total{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.vpon-stage-block{padding:8px 12px 6px;border-bottom:0.5px solid var(--border);margin:0 2px;}
+.vpon-stage-block:last-child{border-bottom:none;}
+.vpon-stage-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.vpon-stage-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+.vpon-stage-usd{font-family:var(--mono);font-size:10px;font-weight:700;}
+.vpon-deal{padding:4px 0;border-top:0.5px solid var(--border);cursor:pointer;border-radius:3px;transition:background .1s;}
+.vpon-deal:first-child{border-top:none;}
+.vpon-deal:hover{background:var(--bg3);}
+.vpon-deal-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:4px;}
+.vpon-deal-name{font-size:10.5px;color:var(--text);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:148px;flex:1;}
+.vpon-deal-usd{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
+.vpon-deal-tags{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;}
+.vpon-tag{font-size:8px;padding:1px 4px;border-radius:3px;font-family:var(--mono);white-space:nowrap;}
+.vpon-io-y{background:#e8f5ee;color:#1e7a3a;}
+.vpon-io-n{background:#fde8e8;color:#c0392b;}
+.vpon-fix{background:#fdf3e3;color:#b8720a;}
+.vpon-crm{background:var(--bg3);color:var(--text3);border:0.5px solid var(--border);}
+.vpon-curr{background:#e6eef8;color:#1a5fa8;}
 </style>
 </head>
 <body>
@@ -586,26 +563,20 @@ body {
 
   <hr class="divider">
 
-  <!-- VPON PIPELINE — Tabbed MY / ID / TH / ALL + Timeline May–Dec -->
   <div class="section fade-in" id="vpon-pipeline-section">
     <div class="section-hd">
       <span style="font-size:13px;flex-shrink:0;">📡</span>
       <span class="section-title">PIPELINE — VPON STAGE (May–Dec 2026)</span>
-      <span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto;">Gwen × CRM Rule | USD 17,827/IDR | MYR 4.38 | 2026-06-15</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto;">Gwen × CRM Rule | 1 USD = IDR 17,827 | MYR 4.38 | 2026-06-15</span>
     </div>
-
     <div class="vpon-bu-tabs">
       <button class="vpon-bu-tab tab-all active" onclick="switchVponBU('ALL',this)">🌏 ALL</button>
-      <button class="vpon-bu-tab tab-my" onclick="switchVponBU('MY',this)">🇲🇾 MY</button>
-      <button class="vpon-bu-tab tab-id" onclick="switchVponBU('ID',this)">🇮🇩 ID</button>
-      <button class="vpon-bu-tab tab-th" onclick="switchVponBU('TH',this)">🇹🇭 TH（原 CRM）</button>
+      <button class="vpon-bu-tab tab-my"  onclick="switchVponBU('MY',this)">🇲🇾 MY</button>
+      <button class="vpon-bu-tab tab-id"  onclick="switchVponBU('ID',this)">🇮🇩 ID</button>
+      <button class="vpon-bu-tab tab-th"  onclick="switchVponBU('TH',this)">🇹🇭 TH（原 CRM）</button>
     </div>
-
-    <div class="card" id="vpon-tl-card" style="padding:14px 18px 12px; margin-bottom:10px;">
-      <div class="card-title" style="margin-bottom:6px;">
-        TIME AXIS — MAY → DEC 2026
-        <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:10px;">點擊月份切換 grid 顯示</span>
-      </div>
+    <div class="card" id="vpon-tl-card" style="padding:14px 18px 12px;margin-bottom:10px;">
+      <div class="card-title" style="margin-bottom:6px;">TIME AXIS — MAY → DEC 2026 <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:8px;">點擊月份切換 grid</span></div>
       <div id="vpon-timeline-bar"></div>
       <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
         <span style="font-family:var(--mono);font-size:9px;color:#1e7a3a;">■ Closed Won</span>
@@ -614,12 +585,9 @@ body {
         <span style="font-family:var(--mono);font-size:9px;color:#718096;">■ Qualification</span>
       </div>
     </div>
-
     <div class="vpon-grid" id="vpon-grid"></div>
-
-    <!-- TH: shows original CRM pipeline -->
-    <div id="th-vpon-section" style="display:none; margin-top:12px;">
-      <div class="section-hd" style="margin-top:12px; border-top:1px solid var(--border2); padding-top:12px;">
+    <div id="th-vpon-section" style="display:none;margin-top:12px;">
+      <div class="section-hd" style="border-top:1px solid var(--border2);padding-top:12px;margin-top:4px;">
         <div class="mkt-dot dot-th"></div>
         <span class="section-title" id="i18n-th">THAILAND</span>
         <span class="section-meta" id="th-meta"></span>
@@ -629,30 +597,22 @@ body {
         <div class="card" id="th-insight-card" style="display:none;"><div class="card-title" id="i18n-insight-th">🤖 AI 業務建議</div><div id="th-insight"></div></div>
       </div>
     </div>
-
-    <!-- AI Insights for MY + ID -->
     <div id="vpon-ai-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
       <div class="card" id="my-insight-card" style="display:none;">
-        <div class="card-title">🤖 AI 業務建議 — 🇲🇾 MY</div>
-        <div id="my-insight"></div>
+        <div class="card-title">🤖 AI 業務建議 — 🇲🇾 MY</div><div id="my-insight"></div>
       </div>
       <div class="card" id="id-insight-card" style="display:none;">
-        <div class="card-title">🤖 AI 業務建議 — 🇮🇩 ID</div>
-        <div id="id-insight"></div>
+        <div class="card-title">🤖 AI 業務建議 — 🇮🇩 ID</div><div id="id-insight"></div>
       </div>
     </div>
   </div>
-
-  <!-- Hidden legacy divs for renderAll compatibility -->
   <div style="display:none;">
-    <div id="my-pipeline"></div><div id="id-pipeline"></div>
-    <div id="my-section"></div>
+    <div id="my-pipeline"></div><div id="id-pipeline"></div><div id="my-section"></div>
     <span id="my-meta"></span><span id="id-meta"></span>
     <span id="i18n-my"></span><span id="i18n-id"></span>
     <span id="i18n-pipe-my"></span><span id="i18n-pipe-id"></span>
     <span id="i18n-insight-my"></span><span id="i18n-insight-id"></span>
   </div>
-
   <hr class="divider">
 
   <!-- ④ AR (MY/ID/TH) + Xero Invoice 並排 -->
@@ -1646,6 +1606,8 @@ function renderAll(d) {
   renderInsight(ai.ID, 'id-insight', 'id-insight-card');
   renderInsight(ai.TH, 'th-insight', 'th-insight-card');
   renderOverview(d.pipeline);
+  // Rebuild Vpon deal map after registry clear
+  vponInit();
   const ar = d.ar||{};
   renderAR(ar.MY||[], 'ar-my');
   renderAR(ar.ID||[], 'ar-id');
@@ -1689,7 +1651,6 @@ function clearPaste() {
 ══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadAccountsFromStorage();
-  vponInit();
   cmGo();
   const ta = document.getElementById('json-input');
   if (ta) {
@@ -1727,21 +1688,18 @@ function switchTab(tab) {
 /* ══════════════════════════════════════════
    CLIENT MASTER DATA
 ══════════════════════════════════════════ */
-// CM_CLIENTS loaded from clients.json
+// CM_CLIENTS — loaded from clients.json
 let CM_CLIENTS = [];
 fetch('clients.json')
   .then(r => r.json())
   .then(data => {
     CM_CLIENTS = data;
-    buildClientMaster();
-    const badge = document.getElementById('cm-n-all');
-    if (badge) badge.textContent = CM_CLIENTS.length;
-    document.getElementById('cm-stats').textContent = `顯示 ${CM_CLIENTS.length} / ${CM_CLIENTS.length} 間公司`;
+      const b = document.getElementById('cm-n-all');
+    if (b) b.textContent = CM_CLIENTS.length;
+    const s = document.getElementById('cm-stats');
+    if (s) s.textContent = '顯示 ' + CM_CLIENTS.length + ' / ' + CM_CLIENTS.length + ' 間公司';
   })
-  .catch(() => {
-    // fallback: clients.json not found, use empty
-    console.warn('clients.json not found');
-  });
+  .catch(() => console.warn('clients.json not found — run via http server'));
 
 function cmStageColor(stage) {
   if (stage.includes('Closed Won')) return '#276749';
@@ -1804,37 +1762,32 @@ function cmGo() {
 }
 
 
-/* ══════════════════════════════════════════
-   VPON STAGE DATA — May–Dec 2026
-   1 USD = IDR 17,827 | 1 MYR = USD 0.228 | 2026-06-15
-══════════════════════════════════════════ */
+/* ══ VPON STAGE DATA May–Dec 2026 ══ */
 const VPON_DATA = {"ID": {"2026-05": {"5. Closed Won": [{"opp": "ID_Lorient_ads_META Ads_May 2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 30000000, "usd": 1683, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Roona Indonesia_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 60000000, "usd": 3366, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Mooimom_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 251000000, "usd": 14080, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Chicco_Meta CPAS_May'26", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 9050830, "usd": 508, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Tuku Online_TikTok_May'26", "crm_stage": "Closed Won", "currency": "TWD", "local_amt": 61598, "usd": 1836, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_EUI Money_Ads_May'26", "crm_stage": "Closed Won", "currency": "TWD", "local_amt": 107868, "usd": 3215, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Hoki Shop_App Install_May'26", "crm_stage": "Closed Won", "currency": "TWD", "local_amt": 672929, "usd": 20058, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_mombaby_KOL_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 5095000, "usd": 286, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2331606, "usd": 131, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Ce Wati_Meta & Tiktok Ads_May'26", "crm_stage": "Closed Won", "currency": "TWD", "local_amt": 18389, "usd": 548, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_IVF Morula_KOL_April2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3027500, "usd": 170, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Pokana_KOL_April2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 9883000, "usd": 554, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Paramex_KOL_Apr26", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2000000, "usd": 112, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Vinko_affiliator_Mar2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 5000000, "usd": 280, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Counterpain Medicated Plester_KOL_April2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 254098361, "usd": 14254, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Mie Gaga_Last Minute_SMM_Mar'26", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 11688525, "usd": 656, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "ID_EUI Money_Ads_Q2'26", "crm_stage": "Closed Won", "currency": "TWD", "local_amt": 102198, "usd": 3046, "cr": 100, "has_io": false, "io_fixed": false}, {"opp": "ID_Kratingdaeng x IBL_KOL_March2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 727826087, "usd": 40827, "cr": 100, "has_io": false, "io_fixed": false}, {"opp": "ID_Chicco_KOL_Q1'26", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 42817680, "usd": 2402, "cr": 100, "has_io": false, "io_fixed": false}, {"opp": "ID_Mooimom_Ads_10 Nov 2025", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 36995885, "usd": 2075, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "ID_Polytron_Wolfgeng Agency_KOL_May'26", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 22704500, "usd": 1274, "cr": 30, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Skinevo_Ads_May2026", "crm_stage": "Qualified(QSL)", "currency": "IDR", "local_amt": 50000000, "usd": 2805, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Technogym_Ads_May2026", "crm_stage": "Qualified(QSL)", "currency": "IDR", "local_amt": 50000000, "usd": 2805, "cr": 100, "has_io": true, "io_fixed": false}]}, "2026-06": {"5. Closed Won": [{"opp": "ID_Lorient_ads_META Ads_June 2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 30000000, "usd": 1683, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Roona Indonesia_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 60000000, "usd": 3366, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Momcozy_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2887324, "usd": 162, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Mooimom_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 178000000, "usd": 9985, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Ce Laras_TikTok Ads_Jun'25", "crm_stage": "Closed Won", "currency": "TWD", "local_amt": 30000, "usd": 894, "cr": 90, "has_io": true, "io_fixed": false}, {"opp": "ID_greenparenting_CPAS_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 9009009, "usd": 505, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3497409, "usd": 196, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Indocafe_KOL_6May", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 13939394, "usd": 782, "cr": 85, "has_io": true, "io_fixed": true}, {"opp": "ID_Mie Gaga_Last Minute_SMM_Mar'26", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 11311475, "usd": 635, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "ID_EUI Money_Ads_Q2'26", "crm_stage": "Closed Won", "currency": "TWD", "local_amt": 98901, "usd": 2948, "cr": 100, "has_io": false, "io_fixed": false}, {"opp": "ID_Chicco_KOL_Q1'26", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 41436464, "usd": 2324, "cr": 100, "has_io": false, "io_fixed": false}, {"opp": "ID_Mooimom_Ads_10 Nov 2025", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 35802469, "usd": 2008, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "ID_Brother Indonesia_Live Shop_21May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 2068966, "usd": 116, "cr": 50, "has_io": true, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Technogym_Ads_June 2026", "crm_stage": "Qualified(QSL)", "currency": "IDR", "local_amt": 50000000, "usd": 2805, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "ID_Flint_KOL_May2026", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 30000000, "usd": 1683, "cr": 5, "has_io": false, "io_fixed": false}, {"opp": "ID_JamBor_Ads&Affiliate_23Apr", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 38571429, "usd": 2164, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Grab For Business_KOL_9Apr", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 3030303, "usd": 170, "cr": 20, "has_io": false, "io_fixed": false}]}, "2026-07": {"5. Closed Won": [{"opp": "ID_Momcozy_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2983568, "usd": 167, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3613990, "usd": 203, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Indocafe_KOL_6May", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 6060606, "usd": 340, "cr": 85, "has_io": true, "io_fixed": true}, {"opp": "ID_Mie Gaga_Last Minute_SMM_Mar'26", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 11688525, "usd": 656, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "ID_Mooimom_Ads_10 Nov 2025", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 36995885, "usd": 2075, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "ID_Counterpain_Indomaret_Affiliator_JUL2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 50000000, "usd": 2805, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_Sensodyne_ContentCreation_26May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 6838356, "usd": 384, "cr": 50, "has_io": true, "io_fixed": false}, {"opp": "ID_BeautyHaul_LiveStream_May2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 55000000, "usd": 3085, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Agora_Vpon Agency_Ads_May'26", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 76229508, "usd": 4276, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "ID_Brother Indonesia_Live Shop_21May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 27931034, "usd": 1567, "cr": 50, "has_io": true, "io_fixed": false}, {"opp": "ID_BNI Life_KOL_18May", "crm_stage": "Negotiation/Review", "currency": "IDR", "local_amt": 479655172, "usd": 26906, "cr": 80, "has_io": true, "io_fixed": false}, {"opp": "ID_Counterpain_Indomaret_KOL_July2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 84239130, "usd": 4725, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_BSIM_in app Ads_Mar2026", "crm_stage": "Negotiation/Review", "currency": "IDR", "local_amt": 688888889, "usd": 38643, "cr": 85, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Andalan Pil KB FE_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 47432432, "usd": 2661, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Andalan Pil KB Laktasi_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 38648649, "usd": 2168, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Lemon_Ads Live_3June", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 20000000, "usd": 1122, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_JamBor_Ads&Affiliate_23Apr", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 111428571, "usd": 6251, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Grab For Business_KOL_9Apr", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 46969697, "usd": 2635, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Indopaket_Branding_April2026", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 48278689, "usd": 2708, "cr": 20, "has_io": false, "io_fixed": false}]}, "2026-08": {"5. Closed Won": [{"opp": "ID_Momcozy_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2983568, "usd": 167, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3613990, "usd": 203, "cr": 80, "has_io": true, "io_fixed": true}], "4. Verbal Commit": [], "3. Negotiation": [{"opp": "ID_Counterpain_Indomaret_Affiliator_AUG2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 50000000, "usd": 2805, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_Counterpain_Indomaret_KOL_August2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 325000000, "usd": 18231, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_Sensodyne_ContentCreation_26May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 8153425, "usd": 457, "cr": 50, "has_io": true, "io_fixed": false}, {"opp": "ID_Agora_Vpon Agency_Ads_May'26", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 76229508, "usd": 4276, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "ID_BNI Life_KOL_18May", "crm_stage": "Negotiation/Review", "currency": "IDR", "local_amt": 55344828, "usd": 3105, "cr": 80, "has_io": true, "io_fixed": false}, {"opp": "ID_Flou by Pokana_H2'26", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 101639344, "usd": 5701, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_Counterpain_Indomaret_KOL_July2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 84239130, "usd": 4725, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_BSIM_in app Ads_Mar2026", "crm_stage": "Negotiation/Review", "currency": "IDR", "local_amt": 688888889, "usd": 38643, "cr": 85, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Andalan Pil KB FE_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 56554054, "usd": 3172, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Andalan Pil KB Laktasi_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 46081081, "usd": 2585, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Indopaket_Branding_April2026", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 48278689, "usd": 2708, "cr": 20, "has_io": false, "io_fixed": false}]}, "2026-09": {"5. Closed Won": [{"opp": "ID_Momcozy_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2887324, "usd": 162, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3497409, "usd": 196, "cr": 80, "has_io": true, "io_fixed": true}], "4. Verbal Commit": [], "3. Negotiation": [{"opp": "ID_Counterpain_Indomaret_Affiliator_september2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 50000000, "usd": 2805, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_Counterpain_Indomaret_KOL_september2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 50000000, "usd": 2805, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_Sensodyne_ContentCreation_26May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 7890411, "usd": 443, "cr": 50, "has_io": true, "io_fixed": false}, {"opp": "ID_Agora_Vpon Agency_Ads_May'26", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 73770492, "usd": 4138, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "ID_Flou by Pokana_H2'26", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 98360656, "usd": 5518, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_Counterpain_Indomaret_KOL_July2026", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 81521739, "usd": 4573, "cr": 50, "has_io": false, "io_fixed": false}, {"opp": "ID_BSIM_in app Ads_Mar2026", "crm_stage": "Negotiation/Review", "currency": "IDR", "local_amt": 666666667, "usd": 37396, "cr": 85, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Andalan Pil KB FE_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 54729730, "usd": 3070, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Andalan Pil KB Laktasi_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 44594595, "usd": 2502, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Indopaket_Branding_April2026", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 46721311, "usd": 2621, "cr": 20, "has_io": false, "io_fixed": false}]}, "2026-10": {"5. Closed Won": [{"opp": "ID_Momcozy_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2983568, "usd": 167, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3613990, "usd": 203, "cr": 80, "has_io": true, "io_fixed": true}], "4. Verbal Commit": [], "3. Negotiation": [{"opp": "ID_Sensodyne_ContentCreation_26May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 8153425, "usd": 457, "cr": 50, "has_io": true, "io_fixed": false}, {"opp": "ID_Agora_Vpon Agency_Ads_May'26", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 73770492, "usd": 4138, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "ID_Oxford OUP_May'26", "crm_stage": "Proposal Sent", "currency": "TWD", "local_amt": 26562, "usd": 792, "cr": 30, "has_io": false, "io_fixed": false}, {"opp": "ID_BSIM_in app Ads_Mar2026", "crm_stage": "Negotiation/Review", "currency": "IDR", "local_amt": 688888889, "usd": 38643, "cr": 85, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Andalan Pil KB FE_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 56554054, "usd": 3172, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Andalan Pil KB Laktasi_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 46081081, "usd": 2585, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Indopaket_Branding_April2026", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 48278689, "usd": 2708, "cr": 20, "has_io": false, "io_fixed": false}]}, "2026-11": {"5. Closed Won": [{"opp": "ID_Momcozy_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2887324, "usd": 162, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3497409, "usd": 196, "cr": 80, "has_io": true, "io_fixed": true}], "4. Verbal Commit": [], "3. Negotiation": [{"opp": "ID_Sensodyne_ContentCreation_26May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 7890411, "usd": 443, "cr": 50, "has_io": true, "io_fixed": false}, {"opp": "ID_Oxford OUP_May'26", "crm_stage": "Proposal Sent", "currency": "TWD", "local_amt": 23438, "usd": 699, "cr": 30, "has_io": false, "io_fixed": false}, {"opp": "ID_BSIM_in app Ads_Mar2026", "crm_stage": "Negotiation/Review", "currency": "IDR", "local_amt": 666666667, "usd": 37396, "cr": 85, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Andalan Pil KB FE_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 54729730, "usd": 3070, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Andalan Pil KB Laktasi_KOL_12Jun", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 44594595, "usd": 2502, "cr": 20, "has_io": false, "io_fixed": false}, {"opp": "ID_Indopaket_Branding_April2026", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 46721311, "usd": 2621, "cr": 20, "has_io": false, "io_fixed": false}]}, "2026-12": {"5. Closed Won": [{"opp": "ID_Momcozy_Ads_June2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 2983568, "usd": 167, "cr": 80, "has_io": true, "io_fixed": true}, {"opp": "ID_Momcozy_Ads_May2026", "crm_stage": "Closed Won", "currency": "IDR", "local_amt": 3613990, "usd": 203, "cr": 80, "has_io": true, "io_fixed": true}], "4. Verbal Commit": [], "3. Negotiation": [{"opp": "ID_Sensodyne_ContentCreation_26May", "crm_stage": "Proposal Sent", "currency": "IDR", "local_amt": 8153425, "usd": 457, "cr": 50, "has_io": true, "io_fixed": false}], "1. Qualification": [{"opp": "ID_Indopaket_Branding_April2026", "crm_stage": "Demo meeting", "currency": "IDR", "local_amt": 48278689, "usd": 2708, "cr": 20, "has_io": false, "io_fixed": false}]}}, "MY": {"2026-05": {"5. Closed Won": [{"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6073, "usd": 1387, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 29051, "usd": 29051, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_AdManagement _ XHS _1May 2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 2879, "usd": 657, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15690, "usd": 3582, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1295, "usd": 1295, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Nuffnang MCD XHS_May", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6650, "usd": 1518, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3767, "usd": 3767, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_MZ Clinic_KOC_ XHS_5March2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 635, "usd": 145, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_Jan26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5132, "usd": 1172, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 1019, "usd": 233, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5061, "usd": 1156, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16702, "usd": 3813, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 13249, "usd": 3025, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 35671, "usd": 8144, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 64, "usd": 15, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 11135, "usd": 2542, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [], "3. Negotiation": [], "1. Qualification": []}, "2026-06": {"5. Closed Won": [{"opp": "MY_PINNARA_IGKOL_May 26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 719, "usd": 719, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_TBB_S2S_June26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 250, "usd": 57, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda_MetaTiktok_June2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 4918, "usd": 1123, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_AtasFrozen_KOC_Jun26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 1000, "usd": 228, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Herbal Farmer KOC_ June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 12978, "usd": 2963, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jannahnoe_AdManagement _ MetaTiktok _May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 20543, "usd": 4690, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5878, "usd": 1342, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 9813, "usd": 2240, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_JubinBMS(1990)_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 14376, "usd": 3282, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Neolivin_AdsManagement_2026April", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 29439, "usd": 6721, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_Ads Management_June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5888, "usd": 1344, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 28114, "usd": 28114, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_AdManagement _ XHS _1May 2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 2121, "usd": 484, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_MyweddingExpo_KOC_May25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6900, "usd": 1575, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15184, "usd": 3467, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1253, "usd": 1253, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "Atas Frozen_KOC Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 1000, "usd": 228, "cr": 90, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3646, "usd": 3646, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_MZ Clinic_KOC_ XHS_5March2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 615, "usd": 140, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 986, "usd": 225, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 4898, "usd": 1118, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16163, "usd": 3690, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 12822, "usd": 2927, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 34521, "usd": 7881, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 62, "usd": 14, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 10776, "usd": 2460, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [], "3. Negotiation": [], "1. Qualification": []}, "2026-07": {"5. Closed Won": [{"opp": "MY_PINNARA_IGKOL_May 26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 281, "usd": 281, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda_MetaTiktok_June2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5082, "usd": 1160, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Herbal Farmer KOC_ June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 25146, "usd": 5741, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jannahnoe_AdManagement _ MetaTiktok _May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 21228, "usd": 4847, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6073, "usd": 1387, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 10140, "usd": 2315, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_JubinBMS(1990)_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 14855, "usd": 3392, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Neolivin_AdsManagement_2026April", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 30421, "usd": 6945, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_Ads Management_June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6084, "usd": 1389, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 29051, "usd": 29051, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15690, "usd": 3582, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1295, "usd": 1295, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3767, "usd": 3767, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 1019, "usd": 233, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5061, "usd": 1156, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16702, "usd": 3813, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 13249, "usd": 3025, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 35671, "usd": 8144, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 64, "usd": 15, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 11135, "usd": 2542, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [], "3. Negotiation": [{"opp": "MY_Onsworks_APUAdManagement _ XHS _1June2016", "crm_stage": "Verbal Committed", "currency": "MYR", "local_amt": 3000, "usd": 685, "cr": 90, "has_io": true, "io_fixed": false}, {"opp": "My_ArturoHome_AdsManagement_May26", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 5000, "usd": 1142, "cr": 30, "has_io": false, "io_fixed": false}, {"opp": "MY_JNDDesign_Agency_23 Apr", "crm_stage": "Negotiation/Review", "currency": "MYR", "local_amt": 1000, "usd": 228, "cr": 30, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "MY_IEM Skincare_KOC_May 26", "crm_stage": "Demo meeting", "currency": "MYR", "local_amt": 5000, "usd": 1142, "cr": 10, "has_io": false, "io_fixed": false}]}, "2026-08": {"5. Closed Won": [{"opp": "MY_Jannahnoe_AdManagement _ MetaTiktok _May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 21228, "usd": 4847, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6073, "usd": 1387, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 10140, "usd": 2315, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_JubinBMS(1990)_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 14855, "usd": 3392, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Neolivin_AdsManagement_2026April", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 30421, "usd": 6945, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_Ads Management_June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6084, "usd": 1389, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 29051, "usd": 29051, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15690, "usd": 3582, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1295, "usd": 1295, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3767, "usd": 3767, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 1019, "usd": 233, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5061, "usd": 1156, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16702, "usd": 3813, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 13249, "usd": 3025, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 35671, "usd": 8144, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 64, "usd": 15, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 11135, "usd": 2542, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "MY_Adelais_XHSrenew_11June2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 31, "usd": 7, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "My_Hanshin Hankyu_FullFunnelMarketing_May 26", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 6078, "usd": 1388, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "MY_BerjayaTimesSquare_XHS_KOC_6May", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 7623, "usd": 1740, "cr": 30, "has_io": false, "io_fixed": false}, {"opp": "MY_佳格食品_Ad Management _May26", "crm_stage": "Negotiation/Review", "currency": "MYR", "local_amt": 10109, "usd": 2308, "cr": 40, "has_io": false, "io_fixed": false}, {"opp": "MY_JNDDesign_Agency_23 Apr", "crm_stage": "Negotiation/Review", "currency": "MYR", "local_amt": 1000, "usd": 228, "cr": 30, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "MY_Mitsubishi_XHS_11June2026", "crm_stage": "Qualified(QSL)", "currency": "MYR", "local_amt": 1800, "usd": 411, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "MY_ASUS_XHS_KOC_6May", "crm_stage": "Demo meeting", "currency": "MYR", "local_amt": 10164, "usd": 2321, "cr": 30, "has_io": false, "io_fixed": false}]}, "2026-09": {"5. Closed Won": [{"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5878, "usd": 1342, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 9813, "usd": 2240, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_JubinBMS(1990)_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 14376, "usd": 3282, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Neolivin_AdsManagement_2026April", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 29439, "usd": 6721, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_Ads Management_June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5888, "usd": 1344, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 28114, "usd": 28114, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15184, "usd": 3467, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1253, "usd": 1253, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3646, "usd": 3646, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 986, "usd": 225, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 4898, "usd": 1118, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16163, "usd": 3690, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 12822, "usd": 2927, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 34521, "usd": 7881, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 62, "usd": 14, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 10776, "usd": 2460, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "MY_Adelais_XHSrenew_11June2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 61, "usd": 14, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "My_Hanshin Hankyu_FullFunnelMarketing_May 26", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 5882, "usd": 1343, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "MY_BerjayaTimesSquare_XHS_KOC_6May", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 7377, "usd": 1684, "cr": 30, "has_io": false, "io_fixed": false}, {"opp": "MY_佳格食品_Ad Management _May26", "crm_stage": "Negotiation/Review", "currency": "MYR", "local_amt": 9783, "usd": 2233, "cr": 40, "has_io": false, "io_fixed": false}], "1. Qualification": [{"opp": "MY_ASUS_XHS_KOC_6May", "crm_stage": "Demo meeting", "currency": "MYR", "local_amt": 9836, "usd": 2246, "cr": 30, "has_io": false, "io_fixed": false}]}, "2026-10": {"5. Closed Won": [{"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6073, "usd": 1387, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 10140, "usd": 2315, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_JubinBMS(1990)_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 14855, "usd": 3392, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Neolivin_AdsManagement_2026April", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 30421, "usd": 6945, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_Ads Management_June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6084, "usd": 1389, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 29051, "usd": 29051, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15690, "usd": 3582, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1295, "usd": 1295, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3767, "usd": 3767, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 1019, "usd": 233, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5061, "usd": 1156, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16702, "usd": 3813, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 13249, "usd": 3025, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 35671, "usd": 8144, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 64, "usd": 15, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 11135, "usd": 2542, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "MY_Adelais_XHSrenew_11June2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 64, "usd": 15, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "My_Hanshin Hankyu_FullFunnelMarketing_May 26", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 6078, "usd": 1388, "cr": 10, "has_io": false, "io_fixed": false}, {"opp": "MY_佳格食品_Ad Management _May26", "crm_stage": "Negotiation/Review", "currency": "MYR", "local_amt": 10109, "usd": 2308, "cr": 40, "has_io": false, "io_fixed": false}], "1. Qualification": []}, "2026-11": {"5. Closed Won": [{"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5878, "usd": 1342, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 9813, "usd": 2240, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_JubinBMS(1990)_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 14376, "usd": 3282, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Neolivin_AdsManagement_2026April", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 29439, "usd": 6721, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_Ads Management_June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5888, "usd": 1344, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 28114, "usd": 28114, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15184, "usd": 3467, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1253, "usd": 1253, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3646, "usd": 3646, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 986, "usd": 225, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 4898, "usd": 1118, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16163, "usd": 3690, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 12822, "usd": 2927, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 34521, "usd": 7881, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 62, "usd": 14, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 10776, "usd": 2460, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "MY_Adelais_XHSrenew_11June2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 61, "usd": 14, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "My_Hanshin Hankyu_FullFunnelMarketing_May 26", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 5882, "usd": 1343, "cr": 10, "has_io": false, "io_fixed": false}], "1. Qualification": []}, "2026-12": {"5. Closed Won": [{"opp": "MY_Bebe amico_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6073, "usd": 1387, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_SailByRiccioneReka_Ads Management_May26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 10140, "usd": 2315, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_JubinBMS(1990)_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 14855, "usd": 3392, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Neolivin_AdsManagement_2026April", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 30421, "usd": 6945, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_Ads Management_June 26", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 6084, "usd": 1389, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Iqueen_AdsManagement_Jan2026", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 29051, "usd": 29051, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Thermos_AdManagement_May to Dec2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 15690, "usd": 3582, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Forklift4s_AdManagement_May to Dec26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 1295, "usd": 1295, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Jubin+XHS_April26", "crm_stage": "Closed Won", "currency": "USD", "local_amt": 3767, "usd": 3767, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Tanita_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 1019, "usd": 233, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Celynda _ FBTiktok _1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 5061, "usd": 1156, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Chicco_Meta_May2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 16702, "usd": 3813, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Lovebite_Meta_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 13249, "usd": 3025, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Adelais_AdManagemet_Google&FB_1Jan2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 35671, "usd": 8144, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Cheongdam_XHSKOC_Sept 25", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 64, "usd": 15, "cr": 100, "has_io": true, "io_fixed": false}, {"opp": "MY_Umma_AdManagement _ FBTikTok _1Jan", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 11135, "usd": 2542, "cr": 100, "has_io": true, "io_fixed": false}], "4. Verbal Commit": [{"opp": "MY_Adelais_XHSrenew_11June2026", "crm_stage": "Closed Won", "currency": "MYR", "local_amt": 64, "usd": 15, "cr": 100, "has_io": false, "io_fixed": false}], "3. Negotiation": [{"opp": "My_Hanshin Hankyu_FullFunnelMarketing_May 26", "crm_stage": "Proposal Sent", "currency": "MYR", "local_amt": 6078, "usd": 1388, "cr": 10, "has_io": false, "io_fixed": false}], "1. Qualification": []}}};
-
 const VPON_MONTHS = ["2026-05", "2026-06", "2026-07", "2026-08", "2026-09", "2026-10", "2026-11", "2026-12"];
 const VPON_MONTH_LABELS = {"2026-05": "May", "2026-06": "Jun", "2026-07": "Jul", "2026-08": "Aug", "2026-09": "Sep", "2026-10": "Oct", "2026-11": "Nov", "2026-12": "Dec"};
 const VPON_STAGES = ["5. Closed Won", "4. Verbal Commit", "3. Negotiation", "1. Qualification"];
 const VPON_STAGE_COLORS = {
-  '5. Closed Won':   {bg:'#e8f5ee', text:'#1e7a3a', dot:'#1e7a3a'},
-  '4. Verbal Commit':{bg:'#f5f0ff', text:'#6a4fb8', dot:'#6a4fb8'},
-  '3. Negotiation':  {bg:'#fdf3e3', text:'#b8720a', dot:'#b8720a'},
-  '1. Qualification':{bg:'#f4f4f8', text:'#718096', dot:'#718096'},
+  '5. Closed Won':   {dot:'#1e7a3a'},
+  '4. Verbal Commit':{dot:'#6a4fb8'},
+  '3. Negotiation':  {dot:'#b8720a'},
+  '1. Qualification':{dot:'#718096'},
 };
 
-let _vponActiveBU = 'ALL';
-let _vponActiveMonths = null; // null = show all 8 months (or first 4 shown)
-let _vponDisplayCount = 4;   // how many months in grid
+// Key → deal object map; rebuilt every renderVponGrid call
+const _vponDealMap = {};
+let _vponBU = 'ALL';
+let _vponMonths = null; // null = first 4
 
 function vponInit() {
-  if (!document.getElementById('vpon-pipeline-section')) return;
   renderVponTimeline();
   renderVponGrid();
 }
 
 function switchVponBU(bu, btn) {
-  _vponActiveBU = bu;
+  _vponBU = bu;
   document.querySelectorAll('.vpon-bu-tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  // TH tab: hide vpon grid, show th section
   const grid = document.getElementById('vpon-grid');
   const thSec = document.getElementById('th-vpon-section');
   const tlCard = document.getElementById('vpon-tl-card');
@@ -1854,150 +1807,135 @@ function switchVponBU(bu, btn) {
   }
 }
 
-function getMergedData() {
-  const bus = _vponActiveBU === 'ALL' ? ['MY','ID'] : [_vponActiveBU];
+function _vponMerge() {
+  const bus = _vponBU === 'ALL' ? ['MY','ID'] : [_vponBU];
   const merged = {};
   VPON_MONTHS.forEach(m => {
     merged[m] = {};
     VPON_STAGES.forEach(vs => {
       merged[m][vs] = [];
-      bus.forEach(bu => {
-        (VPON_DATA[bu]?.[m]?.[vs] || []).forEach(i => {
-          merged[m][vs].push({...i, _bu: bu});
-        });
-      });
+      bus.forEach(bu => (VPON_DATA[bu]?.[m]?.[vs] || []).forEach(i => merged[m][vs].push({...i, _bu: bu})));
     });
   });
   return merged;
 }
 
 function renderVponTimeline() {
-  const container = document.getElementById('vpon-timeline-bar');
-  if (!container) return;
-  const merged = getMergedData();
-  const allTotals = VPON_MONTHS.map(m =>
-    VPON_STAGES.reduce((s, vs) => s + merged[m][vs].reduce((a,i) => a+i.usd, 0), 0)
-  );
-  const maxTotal = Math.max(...allTotals, 1);
-  let html = '<div class="vpon-tl-wrap"><div class="vpon-tl-row">';
-  VPON_MONTHS.forEach((m, mi) => {
-    const stageAmts = VPON_STAGES.map(vs => merged[m][vs].reduce((a,i)=>a+i.usd,0));
-    const total = stageAmts.reduce((a,b)=>a+b,0);
-    const barH = Math.max(4, Math.round(total / maxTotal * 56));
-    const isActive = _vponActiveMonths ? _vponActiveMonths.includes(m) : mi < 4;
-    html += `<div class="vpon-tl-month${isActive?' tl-active':''}" onclick="selectVponMonths('${m}', ${mi})">`;
-    html += `<div class="vpon-tl-bars" style="height:56px;"><div class="vpon-tl-stack" style="height:${barH}px;">`;
-    VPON_STAGES.forEach((vs, si) => {
-      const pct = total > 0 ? stageAmts[si]/total : 0;
-      const segH = Math.max(0, Math.round(pct * barH));
-      if (segH > 0) html += `<div style="height:${segH}px;background:${VPON_STAGE_COLORS[vs].dot};opacity:.85;"></div>`;
+  const el = document.getElementById('vpon-timeline-bar');
+  if (!el) return;
+  const merged = _vponMerge();
+  const totals = VPON_MONTHS.map(m => VPON_STAGES.reduce((s,vs) => s + merged[m][vs].reduce((a,i)=>a+i.usd,0), 0));
+  const maxT = Math.max(...totals, 1);
+  const showM = _vponMonths || VPON_MONTHS.slice(0,4);
+  let h = '<div class="vpon-tl-wrap"><div class="vpon-tl-row">';
+  VPON_MONTHS.forEach((m,mi) => {
+    const sAmts = VPON_STAGES.map(vs => merged[m][vs].reduce((a,i)=>a+i.usd,0));
+    const tot = sAmts.reduce((a,b)=>a+b,0);
+    const barH = Math.max(4, Math.round(tot/maxT*56));
+    const active = showM.includes(m);
+    h += '<div class="vpon-tl-month' + (active?' tl-active':'') + '" onclick="selectVponMonth(' + mi + ')">';
+    h += '<div class="vpon-tl-bars" style="height:56px;"><div class="vpon-tl-stack" style="height:' + barH + 'px;">';
+    VPON_STAGES.forEach((vs,si) => {
+      const segH = tot > 0 ? Math.max(0,Math.round(sAmts[si]/tot*barH)) : 0;
+      if (segH) h += '<div style="height:'+segH+'px;background:'+VPON_STAGE_COLORS[vs].dot+';opacity:.85;"></div>';
     });
-    html += `</div></div>`;
-    html += `<div class="vpon-tl-lbl">${VPON_MONTH_LABELS[m]}</div>`;
-    html += `<div class="vpon-tl-amt">${total>=1000?(total/1000).toFixed(0)+'K':total||'—'}</div>`;
-    html += `<div class="vpon-tl-stage-breakdown">`;
-    VPON_STAGES.forEach((vs, si) => {
-      if (!stageAmts[si]) return;
-      html += `<div style="color:${VPON_STAGE_COLORS[vs].text};">${vs.replace(/^\d\. /,'').slice(0,4)} ${stageAmts[si]>=1000?(stageAmts[si]/1000).toFixed(0)+'K':stageAmts[si]}</div>`;
+    h += '</div></div><div class="vpon-tl-lbl">'+VPON_MONTH_LABELS[m]+'</div>';
+    h += '<div class="vpon-tl-amt">'+(tot>=1000?(tot/1000).toFixed(0)+'K':(tot||'—'))+'</div>';
+    h += '<div class="vpon-tl-sb">';
+    VPON_STAGES.forEach((vs,si) => {
+      if (!sAmts[si]) return;
+      h += '<div style="color:'+VPON_STAGE_COLORS[vs].dot+'">'+vs.replace(/^\d\. /,'').slice(0,4)+' '+(sAmts[si]>=1000?(sAmts[si]/1000).toFixed(0)+'K':sAmts[si])+'</div>';
     });
-    html += `</div></div>`;
+    h += '</div></div>';
   });
-  html += '</div></div>';
-  container.innerHTML = html;
+  h += '</div></div>';
+  el.innerHTML = h;
 }
 
-function selectVponMonths(clickedMonth, idx) {
-  // Show 4 months starting from clicked or nearby
-  let start = Math.max(0, Math.min(idx, VPON_MONTHS.length - 4));
-  _vponActiveMonths = VPON_MONTHS.slice(start, start + 4);
+function selectVponMonth(idx) {
+  const start = Math.max(0, Math.min(idx, VPON_MONTHS.length-4));
+  _vponMonths = VPON_MONTHS.slice(start, start+4);
   renderVponTimeline();
   renderVponGrid();
 }
 
 function renderVponGrid() {
-  const container = document.getElementById('vpon-grid');
-  if (!container) return;
-  const merged = getMergedData();
-  // Which months to show (default: first 4 = May-Aug, or selected)
-  const showMonths = _vponActiveMonths || VPON_MONTHS.slice(0, 4);
-  let html = '';
-  showMonths.forEach(m => {
-    const monthTotal = VPON_STAGES.reduce((s, vs) => s + merged[m][vs].reduce((a,i)=>a+i.usd,0), 0);
-    html += `<div class="vpon-month-col">
-      <div class="vpon-month-hd">
-        <span class="vpon-month-label">${VPON_MONTH_LABELS[m]}</span>
-        <span class="vpon-month-total">${monthTotal>=1000?(monthTotal/1000).toFixed(0)+'K':'$'+monthTotal}</span>
-      </div>`;
+  const el = document.getElementById('vpon-grid');
+  if (!el) return;
+  // Clear old map entries for vpon deals
+  Object.keys(_vponDealMap).forEach(k => delete _vponDealMap[k]);
+  const merged = _vponMerge();
+  const showM = _vponMonths || VPON_MONTHS.slice(0,4);
+  let h = '';
+  showM.forEach(m => {
+    const mTotal = VPON_STAGES.reduce((s,vs) => s + merged[m][vs].reduce((a,i)=>a+i.usd,0), 0);
+    h += '<div class="vpon-month-col">';
+    h += '<div class="vpon-month-hd"><span class="vpon-month-label">'+VPON_MONTH_LABELS[m]+'</span><span class="vpon-month-total">'+(mTotal>=1000?(mTotal/1000).toFixed(0)+'K':'$'+mTotal)+'</span></div>';
     VPON_STAGES.forEach(vs => {
       const items = merged[m][vs];
       if (!items.length) return;
-      const total = items.reduce((a,i)=>a+i.usd,0);
+      const stTotal = items.reduce((a,i)=>a+i.usd,0);
       const col = VPON_STAGE_COLORS[vs];
-      html += `<div class="vpon-stage-block" style="border-left:3px solid ${col.dot};">
-        <div class="vpon-stage-hd">
-          <span class="vpon-stage-label" style="color:${col.dot}">${vs.replace(/^\d\. /,'')}</span>
-          <span class="vpon-stage-usd" style="color:${col.dot}">${(total/1000).toFixed(0)}K</span>
-        </div>
-        <div class="vpon-deal-list">`;
+      h += '<div class="vpon-stage-block" style="border-left:3px solid '+col.dot+';">';
+      h += '<div class="vpon-stage-hd"><span class="vpon-stage-label" style="color:'+col.dot+'">'+vs.replace(/^\d\. /,'')+'</span><span class="vpon-stage-usd" style="color:'+col.dot+'">'+(stTotal/1000).toFixed(0)+'K</span></div>';
+      h += '<div class="vpon-deal-list">';
       items.forEach(i => {
-        const buFlag = _vponActiveBU === 'ALL' ? (i._bu === 'MY' ? '🇲🇾 ' : '🇮🇩 ') : '';
-        const nameClean = i.opp.replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ');
-        const ioTag = i.has_io ? `<span class="vpon-tag vpon-io-y">IO✓</span>` : `<span class="vpon-tag vpon-io-n">IO✗</span>`;
-        const fixTag = i.io_fixed ? `<span class="vpon-tag vpon-fix">→CW</span>` : '';
-        const crmBadge = i.crm_stage !== 'Closed Won'
-          ? `<span class="vpon-tag vpon-crm">${i.crm_stage.replace('Negotiation/Review','Nego').replace('Proposal Sent','Prop').replace('Qualified(QSL)','QSL').replace('Demo meeting','Demo')}</span>` : '';
-        const localFmt = i.currency === 'IDR'
-          ? `IDR ${(i.local_amt/1e6).toFixed(1)}M`
-          : i.currency === 'MYR'
-          ? `MYR ${(i.local_amt/1000).toFixed(0)}K`
-          : `${i.currency} ${i.local_amt.toLocaleString()}`;
-        // Build deal object for click panel (with auto account lookup)
-        const dealKey = registerDeal({
+        // Store in map — key is just an incrementing string, safe for data attribute
+        const vk = 'v' + Object.keys(_vponDealMap).length;
+        const nameFull = i.opp;
+        const nameClean = nameFull.replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ');
+        const buFlag = _vponBU === 'ALL' ? (i._bu === 'MY' ? '🇲🇾 ' : '🇮🇩 ') : '';
+        const localFmt = i.currency==='IDR' ? 'IDR '+(i.local_amt/1e6).toFixed(1)+'M'
+                       : i.currency==='MYR' ? 'MYR '+(i.local_amt/1000).toFixed(0)+'K'
+                       : i.currency+' '+i.local_amt.toLocaleString();
+        _vponDealMap[vk] = {
           name: nameClean,
           stage: i.crm_stage,
-          amount: localFmt + ' (≒ USD ' + i.usd.toLocaleString() + ')',
+          amount: localFmt + ' ≒ USD ' + i.usd.toLocaleString(),
           owner: '',
           account: nameClean,
-          note: `Vpon Stage: ${vs} | Conf: ${i.cr}% | IO: ${i.has_io ? '✓' : '✗'} | ${i.currency} ${i.local_amt.toLocaleString()}`,
+          note: 'Vpon Stage: ' + vs + ' | Conf: ' + i.cr + '% | IO: ' + (i.has_io ? '✓' : '✗') + (i.io_fixed ? ' | ⚡ 有IO可升CW' : ''),
           _vpon: i
-        });
-        html += `<div class="vpon-deal" onclick="openDealByKey('${dealKey}'); autoUpdateAccountDB('${nameClean.replace(/'/g,"\\'")}',${JSON.stringify(i).replace(/</g,'&lt;')})">
-          <div class="vpon-deal-row1">
-            <span class="vpon-deal-name" title="${i.opp}">${buFlag}${nameClean}</span>
-            <span class="vpon-deal-usd">${i.usd.toLocaleString()}</span>
-          </div>
-          <div class="vpon-deal-tags">${ioTag}${fixTag}${crmBadge}<span class="vpon-tag vpon-curr">${localFmt}</span></div>
-        </div>`;
+        };
+        const ioTag = i.has_io ? '<span class="vpon-tag vpon-io-y">IO✓</span>' : '<span class="vpon-tag vpon-io-n">IO✗</span>';
+        const fixTag = i.io_fixed ? '<span class="vpon-tag vpon-fix">→CW</span>' : '';
+        const crmBadge = i.crm_stage !== 'Closed Won'
+          ? '<span class="vpon-tag vpon-crm">'+i.crm_stage.replace('Negotiation/Review','Nego').replace('Proposal Sent','Prop').replace('Qualified(QSL)','QSL').replace('Demo meeting','Demo')+'</span>' : '';
+        h += '<div class="vpon-deal" data-vk="'+vk+'" onclick="openVponDeal(this.dataset.vk)">';
+        h += '<div class="vpon-deal-row1"><span class="vpon-deal-name" title="'+nameFull+'">'+buFlag+nameClean+'</span><span class="vpon-deal-usd">'+i.usd.toLocaleString()+'</span></div>';
+        h += '<div class="vpon-deal-tags">'+ioTag+fixTag+crmBadge+'<span class="vpon-tag vpon-curr">'+localFmt+'</span></div>';
+        h += '</div>';
       });
-      html += `</div></div>`;
+      h += '</div></div>';
     });
-    html += `</div>`;
+    h += '</div>';
   });
-  container.innerHTML = html;
+  el.innerHTML = h;
 }
 
-/* ── AUTO ACCOUNT DB UPDATE ── */
-function autoUpdateAccountDB(dealName, vponItem) {
-  // Only add if not already in DB
-  const existingKey = Object.keys(_accountDB).find(k =>
-    k.toLowerCase() === dealName.toLowerCase() ||
-    dealName.toLowerCase().includes(k.toLowerCase()) ||
-    k.toLowerCase().includes(dealName.toLowerCase())
-  );
-  if (existingKey) return; // already exists
-  // Auto-create minimal entry
-  const newEntry = {
-    bio: {
-      zh: `[${vponItem._bu || ''} 市場] CRM Stage: ${vponItem.crm_stage} | 幣別: ${vponItem.currency} | 由 Vpon pipeline 自動新增`,
-      en: `[${vponItem._bu || ''} Market] CRM Stage: ${vponItem.crm_stage} | Currency: ${vponItem.currency} | Auto-added from Vpon pipeline`
-    },
-    industry: '',
-    country: vponItem._bu || ''
-  };
-  _accountDB[dealName] = newEntry;
-  localStorage.setItem('tagtoo_gm_accounts_v1', JSON.stringify(_accountDB));
-  updateAcctBadge();
-  console.log('Auto-added to account DB:', dealName);
+function openVponDeal(vk) {
+  const d = _vponDealMap[vk];
+  if (!d) { console.warn('vpon deal not found:', vk); return; }
+  openDealPanel(d);  // call openDealPanel directly — no need for registerDeal
+  // Auto-add to account DB if absent
+  if (d.name && d._vpon) {
+    const exists = Object.keys(_accountDB).find(k =>
+      k.toLowerCase() === d.name.toLowerCase() ||
+      d.name.toLowerCase().includes(k.toLowerCase()) ||
+      k.toLowerCase().includes(d.name.toLowerCase())
+    );
+    if (!exists) {
+      _accountDB[d.name] = {
+        bio: {
+          zh: '[' + (d._vpon._bu||'') + ' 市場] CRM: ' + d._vpon.crm_stage + ' | ' + d._vpon.currency + ' | Vpon pipeline 自動新增',
+          en: '[' + (d._vpon._bu||'') + ' Market] CRM: ' + d._vpon.crm_stage + ' | ' + d._vpon.currency + ' | Auto-added from Vpon pipeline'
+        },
+        industry: '',
+        country: d._vpon._bu || ''
+      };
+      try { localStorage.setItem('tagtoo_gm_accounts_v1', JSON.stringify(_accountDB)); updateAcctBadge(); } catch(e) {}
+    }
+  }
 }
 
 function buildClientMaster() {
@@ -2046,7 +1984,7 @@ function buildClientMaster() {
   <div class="cm-controls">
     <input class="cm-search" id="cm-q" type="text" placeholder="搜尋公司名稱、服務、負責人..." oninput="cmGo()">
     <div class="cm-filters">
-      <button class="cm-fb active" onclick="cmSf('all',this)">All <b id="cm-n-all">77</b></button>
+      <button class="cm-fb active" onclick="cmSf('all',this)">All <b id="cm-n-all">76</b></button>
       <button class="cm-fb my" onclick="cmSf('MY',this)">🇲🇾 MY</button>
       <button class="cm-fb id" onclick="cmSf('ID',this)">🇮🇩 ID</button>
       <button class="cm-fb th" onclick="cmSf('TH',this)">🇹🇭 TH</button>
@@ -2055,7 +1993,7 @@ function buildClientMaster() {
       <button class="cm-fb ar" onclick="cmSf('ar',this)">⚠️ AR</button>
     </div>
   </div>
-  <div class="cm-stats" id="cm-stats">顯示 77 / 77 間公司</div>
+  <div class="cm-stats" id="cm-stats">顯示 76 / 76 間公司</div>
   <div id="cm-list"></div>
 </div>
 
