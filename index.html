@@ -1380,57 +1380,54 @@ function renderOverview(pipeline) {
   const markets = ['MY','ID','TH'];
   const labels = {MY:'🇲🇾 MY', ID:'🇮🇩 ID', TH:'🇹🇭 TH'};
 
-  // Closed Won only
-  const HIGH_STAGES = ['closed won'];
-
-  // NTD conversion rates
-  const toNTD = (num, upper) => {
-    if (/IDR/.test(upper)) return num / 527;
-    if (/MYR/.test(upper)) return num * 7.96;
-    if (/THB/.test(upper)) return num * 0.88;
-    return num; // already TWD/NTD
-  };
-
-  // Build month→market→total map from pipeline deals (high stage only)
+  // Build grid from VPON_DATA Closed Won (same source as Vpon Stage section below)
+  // Falls back to pipeline JSON stage='Closed Won' for TH (no VPON_DATA for TH)
+  const USD_TO_NTD = 33.5;
   const grid = {};
   markets.forEach(m => { grid[m] = {}; months.forEach(mo => { grid[m][mo] = 0; }); });
 
-  markets.forEach(mk => {
-    const deals = (pipeline||{})[mk] || [];
-    deals.forEach(d => {
-      if (!d.close_date || !d.amount) return;
-      // Filter: Closed Won only
-      const stageKey = (d.stage||'').toLowerCase().trim();
-      if (!HIGH_STAGES.includes(stageKey)) return;
-
-      // Parse amount
-      const upper = String(d.amount).toUpperCase();
-      const raw = String(d.amount).replace(/[^0-9.]/g,'');
-      let num = parseFloat(raw) || 0;
-      if (/\dB\b/.test(upper)) num *= 1000000000;
-      else if (/\dM\b/.test(upper)) {
-        if (/IDR/.test(upper)) num *= 1000000;
-        else if (/THB/.test(upper)) num *= 1000000;
-        else if (/MYR/.test(upper)) num *= 1000000;
-        else num *= 1000000;
-      } else if (/\dK\b/.test(upper)) num *= 1000;
-
-      const ntd = toNTD(num, upper);
-
-      // Map close_date → month label
-      const cd = String(d.close_date);
-      let mo = null;
-      if (/Q1/i.test(cd)) mo = 'Mar';
-      else if (/Q2/i.test(cd)) mo = 'Jun';
-      else if (/Q3/i.test(cd)) mo = 'Sep';
-      else if (/Q4/i.test(cd)) mo = 'Dec';
-      else {
-        const m2 = cd.match(/\d{4}-(\d{2})/);
-        if (m2) mo = months[parseInt(m2[1])-1];
-        else mo = months.find(m => cd.includes(m)) || null;
-      }
-      if (mo && grid[mk][mo] !== undefined) grid[mk][mo] += ntd;
+  // MY + ID: read from VPON_DATA
+  ['MY','ID'].forEach(mk => {
+    const buData = (VPON_DATA||{})[mk] || {};
+    Object.entries(buData).forEach(([yyyymm, stages]) => {
+      // Parse month: "2026-05" → "May"
+      const parts = yyyymm.split('-');
+      const mo = months[parseInt(parts[1]) - 1];
+      if (!mo) return;
+      const cwDeals = stages['5. Closed Won'] || [];
+      cwDeals.forEach(d => {
+        const usd = d.usd || 0;
+        grid[mk][mo] += usd * USD_TO_NTD;
+      });
     });
+  });
+
+  // TH: fall back to pipeline JSON (no VPON_DATA for TH)
+  const thDeals = (pipeline||{})['TH'] || [];
+  thDeals.forEach(d => {
+    if ((d.stage||'').toLowerCase().trim() !== 'closed won') return;
+    if (!d.close_date || !d.amount) return;
+    const upper = String(d.amount).toUpperCase();
+    const raw = String(d.amount).replace(/[^0-9.]/g,'');
+    let num = parseFloat(raw) || 0;
+    if (/\dB\b/.test(upper)) num *= 1000000000;
+    else if (/\dM\b/.test(upper)) num *= 1000000;
+    else if (/\dK\b/.test(upper)) num *= 1000;
+    let ntd;
+    if (/THB/.test(upper)) ntd = num * 0.88;
+    else ntd = num; // assume TWD
+    const cd = String(d.close_date);
+    let mo = null;
+    if (/Q1/i.test(cd)) mo = 'Mar';
+    else if (/Q2/i.test(cd)) mo = 'Jun';
+    else if (/Q3/i.test(cd)) mo = 'Sep';
+    else if (/Q4/i.test(cd)) mo = 'Dec';
+    else {
+      const m2 = cd.match(/\d{4}-(\d{2})/);
+      if (m2) mo = months[parseInt(m2[1])-1];
+      else mo = months.find(m => cd.includes(m)) || null;
+    }
+    if (mo && grid['TH'][mo] !== undefined) grid['TH'][mo] += ntd;
   });
 
   // Format helper
@@ -1450,7 +1447,7 @@ function renderOverview(pipeline) {
   const tdStyle = 'padding:5px 8px;font-size:11px;text-align:right;white-space:nowrap;';
   const tdLbl  = 'padding:5px 8px;font-size:11px;font-weight:600;white-space:nowrap;';
 
-  let html = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${LANG==='zh'?'Closed Won · 單位：NTD 估算（IDR÷527 / MYR×7.96 / THB×0.88）':'Closed Won · Unit: NTD est. (IDR÷527 / MYR×7.96 / THB×0.88)'}</div>`;
+  let html = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${LANG==='zh'?'Closed Won · 單位：NTD 估算（USD×33.5 / IDR via Vpon / MYR via Vpon）':'Closed Won · Unit: NTD est. (USD×33.5, via Vpon data)'}</div>`;
   html += `<table style="width:100%;border-collapse:collapse;min-width:760px;">`;
   html += `<tr><th style="${thStyle}text-align:left;">${LANG==='zh'?'市場':'Market'}</th>`;
   months.forEach(m => { html += `<th style="${thStyle}">${m}</th>`; });
