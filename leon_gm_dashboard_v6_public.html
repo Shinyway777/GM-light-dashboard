@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GM Dashboard — Tagtoo Global</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #f7f6f2;
+  --bg2:    #ffffff;
+  --bg3:    #f0eeea;
+  --border: rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.14);
+  --text:   #1a1a18;
+  --text2:  #5a5955;
+  --text3:  #aaa89f;
+  --accent: #2a7a2a;
+  --accent2:#1a5fa8;
+  --red:    #c0392b;
+  --amber:  #b8720a;
+  --purple: #6a4fb8;
+  --green:  #1e7a3a;
+  --blue:   #1a5fa8;
+  --mono:   'DM Mono', monospace;
+  --serif:  'Instrument Serif', serif;
+  --sans:   'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(247,246,242,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 0.5px solid var(--border2);
+  padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 52px;
+}
+.topbar-left { display: flex; align-items: baseline; gap: 12px; }
+.logo { font-family: var(--serif); font-size: 19px; color: var(--text); letter-spacing: -.01em; }
+.logo em { font-style: italic; color: var(--accent); }
+.week-badge {
+  font-family: var(--mono); font-size: 11px; color: var(--text3);
+  border: 0.5px solid var(--border2); border-radius: 4px;
+  padding: 2px 7px; letter-spacing: .06em; background: var(--bg3);
+}
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.ts { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.btn {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .04em;
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  color: var(--text2); padding: 6px 14px; border-radius: 5px;
+  cursor: pointer; transition: all .15s;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); background: #f0f7f0; }
+.btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+.btn.primary:hover { background: #333330; }
+
+/* ── PASTE PANEL ── */
+.paste-panel {
+  margin: 20px 28px;
+  background: var(--bg2);
+  border: 0.5px dashed var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  transition: border-color .2s;
+}
+.paste-panel.active { border-color: var(--accent); border-style: solid; }
+.paste-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; margin-bottom: 10px; }
+.paste-panel textarea {
+  width: 100%; height: 110px;
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 6px; padding: 10px 12px;
+  font-family: var(--mono); font-size: 12px; color: var(--text2);
+  resize: vertical; outline: none; transition: border-color .15s;
+}
+.paste-panel textarea:focus { border-color: var(--accent); }
+.paste-panel textarea::placeholder { color: var(--text3); }
+.paste-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.parse-error { font-family: var(--mono); font-size: 11px; color: var(--red); margin-left: auto; }
+
+/* ── MAIN LAYOUT ── */
+.main { padding: 0 28px 48px; }
+
+/* ── KPI ROW ── */
+.kpi-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 20px; }
+.kpi-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border2);
+  border-radius: 10px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+}
+.kpi-card::after {
+  content: ''; position: absolute; bottom: 0; left: 18px; right: 18px; height: 1.5px;
+  background: var(--accent); transform: scaleX(0); transform-origin: left;
+  transition: transform .25s ease;
+}
+.kpi-card:hover::after { transform: scaleX(1); }
+.kpi-lbl { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; margin-bottom: 8px; }
+.kpi-val { font-family: var(--serif); font-size: 34px; color: var(--text); line-height: 1; }
+.kpi-val.good { color: var(--green); }
+.kpi-val.warn { color: var(--amber); }
+.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: var(--mono); }
+
+/* ── SECTION HEADERS ── */
+.section { margin-bottom: 20px; }
+.section-hd {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border2);
+}
+.mkt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-my { background: #2563c8; }
+.dot-id { background: #18884a; }
+.dot-th { background: #c88a18; }
+.dot-ar { background: var(--red); }
+.dot-cal { background: var(--purple); }
+.section-title { font-family: var(--mono); font-size: 11px; color: var(--text2); letter-spacing: .1em; }
+.section-meta { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+/* ── TWO-COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 10px; padding: 16px 18px;
+}
+.card-title { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; margin-bottom: 12px; }
+
+/* ── LANG BTN ── */
+.lang-btn { font-weight: 600; letter-spacing: .08em; min-width: 38px; }
+.lang-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+/* ── PIPELINE TIMELINE ── */
+.pipe-view-toggle { display: flex; gap: 5px; margin-bottom: 10px; }
+.pipe-tab {
+  font-family: var(--mono); font-size: 10px; padding: 3px 10px;
+  border-radius: 3px; border: 0.5px solid var(--border2);
+  color: var(--text3); background: var(--bg3); cursor: pointer;
+  transition: all .12s;
+}
+.pipe-tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.timeline-quarter { margin-bottom: 14px; }
+.timeline-q-hd {
+  font-family: var(--mono); font-size: 10px; color: var(--text3);
+  letter-spacing: .08em; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.timeline-q-hd::after {
+  content: ''; flex: 1; height: 0.5px; background: var(--border2);
+}
+.timeline-month { margin-bottom: 8px; }
+.timeline-month-hd {
+  font-family: var(--mono); font-size: 9px; color: var(--text3);
+  padding: 2px 6px; background: var(--bg3); border-radius: 3px;
+  display: inline-block; margin-bottom: 4px; letter-spacing: .06em;
+}
+.deal-row.clickable { cursor: pointer; border-radius: 4px; padding: 6px 4px; transition: background .12s; }
+.deal-row.clickable:hover { background: var(--bg3); }
+
+/* ── DEAL DETAIL PANEL ── */
+.deal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.25); backdrop-filter: blur(3px);
+}
+.deal-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+@media (min-width: 600px) {
+  .deal-overlay.open { align-items: center; }
+}
+.deal-panel {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 14px 14px 0 0; width: 100%; max-width: 560px;
+  padding: 24px 24px 32px; box-shadow: 0 -8px 32px rgba(0,0,0,.12);
+  animation: slideUp .2s ease;
+  max-height: 80vh; overflow-y: auto;
+}
+@media (min-width: 600px) {
+  .deal-panel { border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,.15); }
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+.deal-panel-hd {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.deal-panel-name { font-family: var(--serif); font-size: 20px; color: var(--text); line-height: 1.2; }
+.deal-panel-close {
+  font-family: var(--mono); font-size: 18px; color: var(--text3);
+  cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;
+  border: none; background: none;
+}
+.deal-panel-close:hover { color: var(--text); }
+.deal-meta-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 16px;
+}
+.deal-meta-item { }
+.deal-meta-lbl { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: .08em; margin-bottom: 3px; }
+.deal-meta-val { font-size: 13px; color: var(--text2); }
+.deal-meta-val.big { font-family: var(--mono); font-size: 15px; color: var(--text); font-weight: 500; }
+.deal-history { border-top: 0.5px solid var(--border2); padding-top: 14px; }
+.deal-history-hd { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: .08em; margin-bottom: 10px; }
+.deal-hist-row { display: flex; gap: 10px; padding: 5px 0; font-size: 12px; color: var(--text2); border-bottom: 0.5px solid var(--border); }
+.deal-hist-row:last-child { border-bottom: none; }
+.deal-hist-date { font-family: var(--mono); font-size: 10px; color: var(--text3); min-width: 60px; padding-top: 1px; flex-shrink: 0; }
+.deal-note { font-size: 12px; color: var(--text2); margin-top: 12px; padding: 10px 12px; background: var(--bg3); border-radius: 6px; line-height: 1.55; }
+
+/* ── PIPELINE ── */
+.pipe-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+.pill {
+  font-family: var(--mono); font-size: 10px; padding: 3px 8px;
+  border-radius: 3px; letter-spacing: .03em; border: 0.5px solid transparent;
+}
+.pill-won   { background: #e8f5ee; color: #1e7a3a; border-color: #b8ddc8; }
+.pill-prop  { background: #e6eef8; color: #1a5fa8; border-color: #b0c8e8; }
+.pill-demo  { background: #fdf3e3; color: #b8720a; border-color: #e8cfa0; }
+.pill-qsl   { background: #eeebf8; color: #6a4fb8; border-color: #c8bce8; }
+.pill-nego  { background: #e8f5ee; color: #1e7a3a; border-color: #b8ddc8; }
+
+.deal-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0; border-bottom: 0.5px solid var(--border);
+  gap: 8px;
+}
+.deal-row:last-child { border-bottom: none; }
+.deal-name { font-size: 12px; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deal-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.deal-amt { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.stage-tag { font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 3px; }
+
+/* ── SLACK ── */
+.slack-msg { padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.slack-msg:last-child { border-bottom: none; }
+.slack-text { font-size: 12px; color: var(--text2); line-height: 1.55; }
+.slack-time { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+/* ── AR ── */
+.ar-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 0; border-bottom: 0.5px solid var(--border); gap: 8px;
+}
+.ar-row:last-child { border-bottom: none; }
+.ar-client { font-size: 12px; color: var(--text); }
+.ar-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.ar-amt { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.ar-status { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 3px; }
+.ar-ok     { background: #e8f5ee; color: #1e7a3a; }
+.ar-warn   { background: #fdf3e3; color: #b8720a; }
+.ar-urgent { background: #fbeaea; color: var(--red); }
+
+/* ── ACCOUNTS PANEL ── */
+.accounts-panel {
+  margin: 0 28px 0;
+  background: var(--bg2);
+  border: 0.5px dashed var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  transition: border-color .2s;
+}
+.accounts-panel.active { border-color: var(--blue); border-style: solid; }
+.accounts-panel textarea {
+  width: 100%; height: 130px;
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 6px; padding: 10px 12px;
+  font-family: var(--mono); font-size: 12px; color: var(--text2);
+  resize: vertical; outline: none; transition: border-color .15s;
+}
+.accounts-panel textarea:focus { border-color: var(--blue); }
+.accounts-panel textarea::placeholder { color: var(--text3); }
+.acct-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.acct-count { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-left: auto; }
+.acct-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--blue); color: #fff;
+  font-family: var(--mono); font-size: 9px; font-weight: 600;
+  border-radius: 8px; padding: 1px 5px; margin-left: 5px;
+  vertical-align: middle; line-height: 1.4;
+}
+
+/* ── AI INSIGHT ── */
+.insight-body { font-size: 12px; color: var(--text2); line-height: 1.7; }
+.insight-item {
+  display: flex; gap: 8px; padding: 6px 0;
+  border-bottom: 0.5px solid var(--border);
+  align-items: flex-start;
+}
+.insight-item:last-child { border-bottom: none; }
+.insight-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.insight-text { flex: 1; }
+.insight-tag {
+  display: inline-block; font-family: var(--mono); font-size: 9px; font-weight: 600;
+  padding: 1px 5px; border-radius: 4px; margin-right: 5px; vertical-align: middle;
+}
+.tag-urgent { background: #fde8e8; color: var(--red); }
+.tag-focus  { background: #e6eef8; color: #1a5fa8; }
+.tag-watch  { background: #fdf3e3; color: #b8720a; }
+.tag-ok     { background: #e8f5ee; color: #1e7a3a; }
+
+/* ── CALENDAR ── */
+.cal-row {
+  display: flex; gap: 14px; padding: 7px 0;
+  border-bottom: 0.5px solid var(--border); align-items: flex-start;
+}
+.cal-row:last-child { border-bottom: none; }
+.cal-time { font-family: var(--mono); font-size: 10px; color: var(--text3); min-width: 90px; padding-top: 1px; flex-shrink: 0; }
+.cal-title { font-size: 12px; color: var(--text); }
+.cal-loc { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* ── ACTION ITEMS ── */
+.action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.action-card {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 8px; padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.action-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.dot-high   { background: var(--red); }
+.dot-medium { background: var(--amber); }
+.dot-low    { background: var(--text3); }
+.action-mkt  { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-bottom: 3px; letter-spacing: .04em; }
+.action-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* ── QUICK LINKS ── */
+.links-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.link-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 6px; padding: 7px 12px;
+  text-decoration: none; color: var(--text2);
+  font-size: 12px; transition: all .15s; cursor: pointer;
+}
+.link-pill:hover { border-color: var(--blue); color: var(--blue); background: #f0f4fc; }
+.link-icon { font-size: 13px; }
+
+/* ── SLACK DONE ── */
+.slack-section-label {
+  font-family: var(--mono); font-size: 9px; color: var(--text3);
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 6px 0 4px; margin-top: 8px;
+  border-top: 0.5px dashed var(--border2);
+}
+.slack-section-label:first-child { margin-top: 0; border-top: none; }
+.slack-msg.done .slack-text { text-decoration: line-through; color: var(--text3); }
+.slack-msg.done .slack-time { color: var(--border2); }
+
+/* ── AR DONE ── */
+.ar-row.done .ar-client,
+.ar-row.done .ar-amt { text-decoration: line-through; color: var(--text3); }
+.ar-row.done .ar-status { background: var(--bg3); color: var(--text3); }
+
+/* ── EMPTY ── */
+.empty { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 14px 0; text-align: center; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 0.5px solid var(--border2); margin: 20px 0; }
+
+/* ── FOOTER ── */
+.footer { text-align: center; padding: 24px 0 12px; font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .06em; }
+
+/* ── ANIM ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.fade-in { animation: fadeUp .22s ease both; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .kpi-row { grid-template-columns: repeat(4, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .topbar, .main { padding-left: 16px; padding-right: 16px; }
+  .paste-panel { margin-left: 16px; margin-right: 16px; }
+}
+
+.saved-badge {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  color: var(--green); background: rgba(30,122,58,0.1);
+  border: 1px solid rgba(30,122,58,0.25);
+  border-radius: 20px; padding: 3px 10px;
+  opacity: 0; transition: opacity .4s ease;
+  pointer-events: none;
+}
+.btn-danger {
+  color: var(--red) !important;
+  border-color: rgba(192,57,43,0.3) !important;
+  font-size: 11px !important;
+}
+.btn-danger:hover { background: rgba(192,57,43,0.08) !important; }
+
+/* ── TAB NAV ── */
+.tab-nav {
+  background: var(--bg2); border-bottom: 1px solid var(--border2);
+  padding: 0 28px; display: flex; gap: 0; position: sticky; top: 52px; z-index: 99;
+}
+.tab-btn {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: var(--text3); padding: 10px 18px; cursor: pointer;
+  transition: all .15s; font-weight: 500;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── CLIENT MASTER ── */
+#client-master { display: none; padding: 0 28px 60px; }
+.cm-controls {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 10px; padding: 14px 16px; margin: 16px 0 10px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.cm-search {
+  width: 100%; padding: 9px 14px;
+  border: 1px solid var(--border2); border-radius: 7px;
+  font-family: var(--sans); font-size: 13px; color: var(--text);
+  background: var(--bg3); outline: none; transition: border-color .15s;
+}
+.cm-search:focus { border-color: var(--accent); }
+.cm-filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.cm-fb {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border2); background: var(--bg2);
+  font-family: var(--mono); font-size: 11px; cursor: pointer;
+  color: var(--text2); transition: all .15s; font-weight: 500;
+}
+.cm-fb:hover { border-color: var(--accent); color: var(--accent); }
+.cm-fb.active  { background: var(--text); color: var(--bg); border-color: var(--text); }
+.cm-fb.my.active  { background: #1B5E20; border-color: #1B5E20; color:#fff; }
+.cm-fb.id.active  { background: #7B3F00; border-color: #7B3F00; color:#fff; }
+.cm-fb.th.active  { background: #1A237E; border-color: #1A237E; color:#fff; }
+.cm-fb.won.active { background: var(--green); border-color: var(--green); color:#fff; }
+.cm-fb.pipe.active{ background: var(--amber); border-color: var(--amber); color:#fff; }
+.cm-fb.ar.active  { background: var(--red); border-color: var(--red); color:#fff; }
+.cm-stats { font-family: var(--mono); font-size: 11px; color: var(--text3); margin: 0 0 4px; }
+.cm-mkt-hdr {
+  color: #fff; font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .07em; padding: 7px 14px; border-radius: 7px; margin: 16px 0 8px;
+}
+.cm-card {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 10px; margin-bottom: 10px; padding: 14px 16px;
+  transition: box-shadow .15s;
+}
+.cm-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.cm-card-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.cm-acct { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; line-height: 1.3; }
+.cm-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
+.cm-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-family: var(--mono); font-size: 10px; font-weight: 600; white-space: nowrap; color: #fff; }
+.cm-badge.warn { background: var(--red); }
+.cm-badge.prob { background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border2); }
+.cm-profile {
+  font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 10px;
+  padding: 10px 12px; background: var(--bg3); border-radius: 7px;
+  border: 0.5px solid var(--border);
+}
+.cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.cm-item { background: var(--bg3); border-radius: 6px; padding: 7px 9px; border: 0.5px solid var(--border); }
+.cm-item.span2 { grid-column: span 2; }
+.cm-item.ar-row { background: #fff5f5; border-color: #fecaca; }
+.cm-lbl { display: block; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: .04em; margin-bottom: 2px; }
+.cm-val { font-size: 12px; color: var(--text2); font-weight: 500; }
+.cm-val.ar { color: var(--red); font-weight: 700; }
+.cm-val.notes { color: var(--text2); font-weight: 400; font-style: italic; }
+.cm-hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">GM <em>Dashboard</em></span>
+    <span class="week-badge" id="week-badge">—</span>
+  </div>
+  <div class="topbar-right">
+    <span class="ts" id="ts">尚未載入</span>
+    <span class="saved-badge" id="saved-badge">✓ 已儲存</span>
+    <button class="btn lang-btn" id="lang-btn" onclick="toggleLang()">EN</button>
+    <button class="btn" id="acct-btn" onclick="toggleAccounts()">🏢 公司庫<span class="acct-badge" id="acct-badge">0</span></button>
+    <button class="btn" id="paste-btn" onclick="togglePaste()">貼入 JSON</button>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" id="tab-dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  <button class="tab-btn" id="tab-clients" onclick="switchTab('clients')">🏢 Client Master</button>
+</div>
+
+<div class="accounts-panel" id="accounts-panel" style="display:none; margin-bottom:0;">
+  <div class="paste-label">// 🏢 公司資料庫 — 貼入後永久儲存於本機，不會被週報 JSON 覆蓋</div>
+  <textarea id="accounts-input" placeholder='{"PT Bank Sinarmas": {"bio": {"zh": "...", "en": "..."}, "industry": "Banking", "country": "ID"}, ...}'></textarea>
+  <div class="acct-actions">
+    <button class="btn primary" onclick="saveAccounts()">儲 存</button>
+    <button class="btn" onclick="clearAccountsInput()">清 除</button>
+    <button class="btn" onclick="exportAccounts()">匯 出</button>
+    <span class="acct-count" id="acct-status"></span>
+  </div>
+</div>
+
+<div class="paste-panel" id="paste-panel" style="display:none;">
+  <div class="paste-label">// 貼入 Claude 產生的 JSON，按「渲染」即更新 dashboard</div>
+  <textarea id="json-input" placeholder='{"generated_at": "2026-05-07 17:30", "week": "W19", ...}'></textarea>
+  <div class="paste-actions">
+    <button class="btn primary" data-i18n="render" onclick="renderFromPaste()">渲 染</button>
+    <button class="btn" data-i18n="clear" onclick="clearPaste()">清 除</button>
+    <button class="btn btn-danger" onclick="clearSavedJson()" title="清除本機儲存的週報 JSON">🗑 清除已儲存</button>
+    <span class="parse-error" id="parse-error"></span>
+  </div>
+</div>
+
+<div class="main" id="main" style="display:none;">
+
+  <div class="kpi-row fade-in" id="kpi-row"></div>
+
+  <!-- PIPELINE OVERVIEW -->
+  <div class="section fade-in" id="pipe-overview-section" style="margin-top:16px;">
+    <div class="section-hd" style="cursor:pointer;" onclick="toggleOverview()">
+      <span style="font-size:13px;flex-shrink:0;">📊</span>
+      <span class="section-title" id="i18n-pipe-overview">PIPELINE OVERVIEW — 全年佈局</span>
+      <span id="overview-chevron" style="margin-left:auto;font-size:12px;color:var(--text3);transition:transform .2s;">▲</span>
+    </div>
+    <div id="pipe-overview-body">
+      <div class="card" style="overflow-x:auto;">
+        <div id="pipe-overview-table"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ① MY: Pipeline + AI Insight 並排 -->
+  <div class="section fade-in" id="my-section">
+    <div class="section-hd">
+      <div class="mkt-dot dot-my"></div>
+      <span class="section-title" id="i18n-my">MALAYSIA</span>
+      <span class="section-meta" id="my-meta"></span>
+    </div>
+    <div class="two-col">
+      <div class="card"><div class="card-title" id="i18n-pipe-my">PIPELINE — CRM</div><div id="my-pipeline"></div></div>
+      <div class="card" id="my-insight-card" style="display:none;"><div class="card-title" id="i18n-insight-my">🤖 AI 業務建議</div><div id="my-insight"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ② ID: Pipeline + AI Insight 並排 -->
+  <div class="section fade-in">
+    <div class="section-hd">
+      <div class="mkt-dot dot-id"></div>
+      <span class="section-title" id="i18n-id">INDONESIA</span>
+      <span class="section-meta" id="id-meta"></span>
+    </div>
+    <div class="two-col">
+      <div class="card"><div class="card-title" id="i18n-pipe-id">PIPELINE — CRM</div><div id="id-pipeline"></div></div>
+      <div class="card" id="id-insight-card" style="display:none;"><div class="card-title" id="i18n-insight-id">🤖 AI 業務建議</div><div id="id-insight"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ③ TH: Pipeline + AI Insight 並排 -->
+  <div class="section fade-in">
+    <div class="section-hd">
+      <div class="mkt-dot dot-th"></div>
+      <span class="section-title" id="i18n-th">THAILAND</span>
+      <span class="section-meta" id="th-meta"></span>
+    </div>
+    <div class="two-col">
+      <div class="card"><div class="card-title" id="i18n-pipe-th">PIPELINE — CRM</div><div id="th-pipeline"></div></div>
+      <div class="card" id="th-insight-card" style="display:none;"><div class="card-title" id="i18n-insight-th">🤖 AI 業務建議</div><div id="th-insight"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ④ AR (MY/ID/TH) + Xero Invoice 並排 -->
+  <div class="two-col fade-in">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-ar"></div>
+        <span class="section-title" id="i18n-ar">AR / OVERDUE</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card"><div class="card-title" id="i18n-ar-my">MALAYSIA</div><div id="ar-my"></div></div>
+        <div class="card"><div class="card-title" id="i18n-ar-id">INDONESIA</div><div id="ar-id"></div></div>
+        <div class="card"><div class="card-title" id="i18n-ar-th">THAILAND</div><div id="ar-th"></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-size:13px;flex-shrink:0;">📄</span>
+        <span class="section-title" id="i18n-xero">XERO — INVOICES DUE</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card"><div class="card-title">MALAYSIA (MYR)</div><div id="xero-my"></div></div>
+        <div class="card"><div class="card-title">INDONESIA (IDR)</div><div id="xero-id"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ⑤ Action Items -->
+  <div class="section fade-in">
+    <div class="section-hd">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0;"></span>
+      <span class="section-title" id="i18n-act">ACTION ITEMS</span>
+    </div>
+    <div class="action-grid" id="action-grid"></div>
+  </div>
+
+  <!-- ⑥ G-Leaders + Global Allhands 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:var(--text3);">#</span>
+        <span class="section-title" id="i18n-lead">G-LEADERS — LATEST</span>
+      </div>
+      <div class="card"><div id="leaders-content"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:var(--text3);">#</span>
+        <span class="section-title" id="i18n-all">GLOBAL-ALLHANDS</span>
+      </div>
+      <div class="card"><div id="allhands-content"></div></div>
+    </div>
+  </div>
+
+  <!-- ⑦ MY-Team + ID-Team 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-my"></div>
+        <span class="section-title" id="i18n-myteam">#MY-TEAM</span>
+      </div>
+      <div class="card"><div id="my-team-content"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-id"></div>
+        <span class="section-title" id="i18n-idteam">#ID-TEAM</span>
+      </div>
+      <div class="card"><div id="id-team-content"></div></div>
+    </div>
+  </div>
+
+  <!-- ⑧ Ruby + Ranti DM 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-my"></div>
+        <span class="section-title" id="i18n-slack-ruby">RUBY — SLACK DM</span>
+      </div>
+      <div class="card"><div id="my-slack"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-id"></div>
+        <span class="section-title" id="i18n-slack-ranti">RANTI — SLACK DM</span>
+      </div>
+      <div class="card"><div id="id-slack"></div></div>
+    </div>
+  </div>
+
+  <!-- ⑨ Jinger DM + Calendar 並排 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-th"></div>
+        <span class="section-title" id="i18n-slack-jinger">JINGER — SLACK DM</span>
+      </div>
+      <div class="card"><div id="th-slack"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <div class="mkt-dot dot-cal"></div>
+        <span class="section-title" id="i18n-cal">CALENDAR — THIS &amp; NEXT WEEK</span>
+      </div>
+      <div class="card"><div id="cal-content"></div></div>
+    </div>
+
+
+  <!-- LINE 討論記錄 -->
+  <div class="two-col fade-in" style="margin-top:20px;">
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:#06C755;font-weight:700;">LINE</span>
+        <span class="section-title" id="i18n-line-strategy">塔圖營運策略討論</span>
+      </div>
+      <div class="card"><div id="line-strategy-content"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-hd">
+        <span style="font-family:var(--mono);font-size:13px;color:#06C755;font-weight:700;">LINE</span>
+        <span class="section-title" id="i18n-line-ops">Tagtoo Global 討論區</span>
+      </div>
+      <div class="card"><div id="line-ops-content"></div></div>
+    </div>
+  </div>
+  <div class="section fade-in" style="margin-top:20px;">
+    <div class="section-hd"><span class="section-title" id="i18n-links">QUICK LINKS</span></div>
+    <div class="links-row">
+      <a class="link-pill" href="https://docs.google.com/spreadsheets/d/1tcaobsbpv61_l--RSM77nn6_84YfBU0Kl-Gg2dw_xxM/edit" target="_blank"><span class="link-icon">📊</span>KPI Dashboard (Weekly)</a>
+      <a class="link-pill" href="https://docs.google.com/spreadsheets/d/1HGj18N7ldrDwyD7sIoIKWO33Z6qHtn_F/view" target="_blank"><span class="link-icon">📁</span>KPI Dashboard.xlsx</a>
+      <a class="link-pill" href="https://drive.google.com/file/d/1MS1EkONFQCVmkm1JBrBql-07TM7GMxAE/view" target="_blank"><span class="link-icon">🐍</span>ETL Script v5</a>
+      <a class="link-pill" href="https://docs.google.com/document/d/1DnzKo3rqZBflLCQqr80vkgF9NTyXy7qfY7mxKCAJaD8/edit" target="_blank"><span class="link-icon">📝</span>SEA Dashboard Handoff</a>
+      <a class="link-pill" href="https://one.zoho.com/zohoone/tagtoo/home/cxapp/crm/org776564636/tab/Reports/5244876000069870106" target="_blank"><span class="link-icon">🔗</span>Zoho CRM Report</a>
+      <a class="link-pill" href="https://one.zoho.com/zohoone/tagtoo/home/cxapp/crm" target="_blank"><span class="link-icon">🏢</span>Zoho CRM</a>
+      <a class="link-pill" href="https://app.slack.com/client/T055KMZEJJ2/C055KMZEJJ2" target="_blank"><span class="link-icon">💬</span>#g-leaders</a>
+      <a class="link-pill" href="https://drive.google.com/drive/folders/1CFOUAlbn7MB3Gv06TZGR0u-EDPuTJ__6" target="_blank"><span class="link-icon">📂</span>Obsidian Vault Drive</a>
+    </div>
+  </div>
+</div>
+
+<div class="deal-overlay" id="deal-overlay" onclick="closeDealPanel(event)">
+  <div class="deal-panel" id="deal-panel">
+    <div class="deal-panel-hd">
+      <div class="deal-panel-name" id="dp-name"></div>
+      <button class="deal-panel-close" onclick="closeDealPanel()">✕</button>
+    </div>
+    <div class="deal-meta-grid" id="dp-meta"></div>
+    <div class="deal-note" id="dp-note" style="display:none;"></div>
+    <div id="dp-bio" style="display:none; font-size:12px; color:var(--text2); line-height:1.6; margin-top:12px; padding:10px 12px; background:var(--bg3); border-radius:6px; border-left:2px solid var(--border2);"></div>
+    <div class="deal-history" id="dp-history" style="display:none;">
+      <div class="deal-history-hd" id="dp-hist-lbl">HISTORY</div>
+      <div id="dp-hist-rows"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">TAGTOO GLOBAL · GM DASHBOARD · LOCAL BUILD</div>
+
+<script>
+/* ══════════════════════════════════════════
+   ACCOUNT DATABASE — localStorage persistent
+══════════════════════════════════════════ */
+let _accountDB = {};
+const ACCT_KEY = 'tagtoo_gm_accounts_v1';
+
+function loadAccountsFromStorage() {
+  try {
+    const raw = localStorage.getItem(ACCT_KEY);
+    if (raw) {
+      _accountDB = JSON.parse(raw);
+      updateAcctBadge();
+    }
+  } catch(e) { console.warn('accounts load failed', e); }
+}
+function updateAcctBadge() {
+  const n = Object.keys(_accountDB).length;
+  const badge = document.getElementById('acct-badge');
+  if (badge) badge.textContent = n;
+}
+function lookupAccount(accountName) {
+  if (!accountName || !Object.keys(_accountDB).length) return null;
+  const key = Object.keys(_accountDB).find(k =>
+    k.toLowerCase() === accountName.toLowerCase() ||
+    accountName.toLowerCase().includes(k.toLowerCase()) ||
+    k.toLowerCase().includes(accountName.toLowerCase())
+  );
+  return key ? _accountDB[key] : null;
+}
+function toggleAccounts() {
+  const p = document.getElementById('accounts-panel');
+  const isHidden = p.style.display === 'none';
+  p.style.display = isHidden ? '' : 'none';
+  if (isHidden) {
+    // pre-fill with current DB so user can see & edit
+    const ta = document.getElementById('accounts-input');
+    if (Object.keys(_accountDB).length) {
+      ta.value = JSON.stringify(_accountDB, null, 2);
+    }
+    updateAcctStatus();
+  }
+}
+function saveAccounts() {
+  const raw = document.getElementById('accounts-input').value.trim();
+  const statusEl = document.getElementById('acct-status');
+  try {
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    _accountDB = parsed;
+    localStorage.setItem(ACCT_KEY, JSON.stringify(parsed));
+    updateAcctBadge();
+    const n = Object.keys(parsed).length;
+    statusEl.textContent = `✓ 已儲存 ${n} 家公司`;
+    statusEl.style.color = 'var(--green)';
+    // re-render pipeline if data loaded, to refresh any open panels
+    if (_lastData) renderAll(_lastData);
+  } catch(e) {
+    statusEl.textContent = '⚠ 解析失敗：' + e.message.slice(0,50);
+    statusEl.style.color = 'var(--red)';
+  }
+}
+function clearAccountsInput() {
+  document.getElementById('accounts-input').value = '';
+  document.getElementById('acct-status').textContent = '';
+}
+function exportAccounts() {
+  const json = JSON.stringify(_accountDB, null, 2);
+  document.getElementById('accounts-input').value = json;
+  document.getElementById('acct-status').textContent = `已匯出 ${Object.keys(_accountDB).length} 家公司至文字框`;
+  document.getElementById('acct-status').style.color = 'var(--text3)';
+}
+function updateAcctStatus() {
+  const n = Object.keys(_accountDB).length;
+  const s = document.getElementById('acct-status');
+  s.textContent = n ? `目前已儲存 ${n} 家公司` : '尚無資料';
+  s.style.color = 'var(--text3)';
+}
+
+/* ══════════════════════════════════════════
+   BILINGUAL FIELD RESOLVER
+   L(field) — reads {zh, en} object OR plain string.
+   Falls back gracefully so old JSON still works.
+══════════════════════════════════════════ */
+function L(field) {
+  if (!field) return '';
+  if (typeof field === 'object') return field[LANG] ?? field.zh ?? field.en ?? '';
+  return String(field);
+}
+
+/* ══════════════════════════════════════════
+   I18N — UI labels only
+══════════════════════════════════════════ */
+let LANG = 'zh';
+const T = {
+  zh: {
+    paste_btn:     '貼入 JSON',
+    sample_btn:    '載入範例',
+    render_btn:    '渲 染',
+    clear_btn:     '清 除',
+    paste_label:   '// 貼入 Claude 產生的 JSON，按「渲染」即更新 dashboard',
+    paste_ph:      '{"generated_at": "2026-05-07 17:30", "week": "W19", ...}',
+    not_loaded:    '尚未載入',
+    active_deals:  n => `${n} 個進行中`,
+    no_deals:      'No active deals',
+    no_msgs:       'No recent messages',
+    no_events:     'No upcoming events',
+    no_actions:    'No action items',
+    cleared:       '清零 ✓',
+    done_label:    '✓ 已完成 (30天內)',
+    list_view:     '列表',
+    timeline_view: '時間軸',
+    close_month:   '預計結案月份',
+    q_label:       q => `Q${q}`,
+    no_close_date: '未填結案日期',
+    dp_stage:      '階段',
+    dp_amount:     '金額',
+    dp_close:      '預計結案',
+    dp_owner:      '負責人',
+    dp_account:    '客戶',
+    dp_industry:   '產業',
+    dp_note:       '備注',
+    dp_history:    '歷史合作',
+    dp_hist_none:  '無歷史紀錄',
+    dp_no_date:    '—',
+    section_my:    'MALAYSIA',
+    section_id:    'INDONESIA',
+    section_th:    'THAILAND',
+    section_ar:    'AR / OVERDUE',
+    section_cal:   'CALENDAR — THIS & NEXT WEEK',
+    section_act:   'ACTION ITEMS',
+    section_lead:  'G-LEADERS — LATEST',
+    section_all:   'GLOBAL-ALLHANDS',
+    section_myteam:'#MY-TEAM',
+    section_idteam:'#ID-TEAM',
+    section_links: 'QUICK LINKS',
+    card_pipeline: 'PIPELINE — CRM',
+    card_ruby:     'RUBY — SLACK DM',
+    card_ranti:    'RANTI — SLACK DM',
+    card_jinger:   'JINGER — SLACK DM',
+    card_ar_my:    'MALAYSIA',
+    card_ar_id:    'INDONESIA',
+    priority_high: 'HIGH',
+    priority_med:  'MED',
+    priority_low:  'LOW',
+  },
+  en: {
+    paste_btn:     'Paste JSON',
+    sample_btn:    'Load Sample',
+    render_btn:    'Render',
+    clear_btn:     'Clear',
+    paste_label:   '// Paste Claude-generated JSON and click Render to update dashboard',
+    paste_ph:      '{"generated_at": "2026-05-07 17:30", "week": "W19", ...}',
+    not_loaded:    'Not loaded',
+    active_deals:  n => `${n} active deals`,
+    no_deals:      'No active deals',
+    no_msgs:       'No recent messages',
+    no_events:     'No upcoming events',
+    no_actions:    'No action items',
+    cleared:       'Cleared ✓',
+    done_label:    '✓ Completed (last 30 days)',
+    list_view:     'List',
+    timeline_view: 'Timeline',
+    close_month:   'Expected close month',
+    q_label:       q => `Q${q}`,
+    no_close_date: 'No close date',
+    dp_stage:      'Stage',
+    dp_amount:     'Amount',
+    dp_close:      'Expected Close',
+    dp_owner:      'Owner',
+    dp_account:    'Account',
+    dp_industry:   'Industry',
+    dp_note:       'Notes',
+    dp_history:    'Past Collaboration',
+    dp_hist_none:  'No history on record',
+    dp_no_date:    '—',
+    section_my:    'MALAYSIA',
+    section_id:    'INDONESIA',
+    section_th:    'THAILAND',
+    section_ar:    'AR / OVERDUE',
+    section_cal:   'CALENDAR — THIS & NEXT WEEK',
+    section_act:   'ACTION ITEMS',
+    section_lead:  'G-LEADERS — LATEST',
+    section_all:   'GLOBAL-ALLHANDS',
+    section_myteam:'#MY-TEAM',
+    section_idteam:'#ID-TEAM',
+    section_links: 'QUICK LINKS',
+    card_pipeline: 'PIPELINE — CRM',
+    card_ruby:     'RUBY — SLACK DM',
+    card_ranti:    'RANTI — SLACK DM',
+    card_jinger:   'JINGER — SLACK DM',
+    card_ar_my:    'MALAYSIA',
+    card_ar_id:    'INDONESIA',
+    priority_high: 'HIGH',
+    priority_med:  'MED',
+    priority_low:  'LOW',
+  }
+};
+function t(key, ...args) {
+  const val = T[LANG][key];
+  return typeof val === 'function' ? val(...args) : (val ?? T.en[key] ?? key);
+}
+function toggleLang() {
+  LANG = LANG === 'zh' ? 'en' : 'zh';
+  const btn = document.getElementById('lang-btn');
+  btn.textContent = LANG === 'zh' ? 'EN' : '中';
+  btn.classList.toggle('active', LANG === 'en');
+  applyI18nStatic();
+  if (_lastData) renderAll(_lastData);
+}
+function applyI18nStatic() {
+  document.getElementById('paste-btn').textContent      = t('paste_btn');
+  document.getElementById('json-input').placeholder     = t('paste_ph');
+  document.querySelector('.paste-label').textContent    = t('paste_label');
+  document.querySelector('[data-i18n="render"]').textContent  = t('render_btn');
+  document.querySelector('[data-i18n="clear"]').textContent   = t('clear_btn');
+  // Section titles
+  const map = {
+    'i18n-my': 'section_my', 'i18n-id': 'section_id', 'i18n-th': 'section_th',
+    'i18n-ar': 'section_ar', 'i18n-cal': 'section_cal', 'i18n-act': 'section_act',
+    'i18n-lead': 'section_lead', 'i18n-all': 'section_all',
+    'i18n-myteam': 'section_myteam', 'i18n-idteam': 'section_idteam',
+    'i18n-links': 'section_links',
+    'i18n-pipe-my': 'card_pipeline', 'i18n-pipe-id': 'card_pipeline', 'i18n-pipe-th': 'card_pipeline',
+    'i18n-slack-ruby': 'card_ruby', 'i18n-slack-ranti': 'card_ranti', 'i18n-slack-jinger': 'card_jinger',
+    'i18n-ar-my': 'card_ar_my', 'i18n-ar-id': 'card_ar_id',
+  };
+  Object.entries(map).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t(key);
+  });
+  if (!document.getElementById('ts').textContent || document.getElementById('ts').textContent === t('not_loaded'))
+    document.getElementById('ts').textContent = t('not_loaded');
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE STATE — per market view mode
+══════════════════════════════════════════ */
+const pipeMode = { MY: 'list', ID: 'list', TH: 'list' };
+let _lastData = null;
+
+/* ══════════════════════════════════════════
+   STAGE HELPERS
+══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   AMOUNT HELPERS — parse & sum pipeline amounts
+══════════════════════════════════════════ */
+function parseAmount(amtStr) {
+  if (!amtStr) return null;
+  const s = String(amtStr).replace(/,/g,'').trim();
+  const m = s.match(/([A-Z]{2,3})\s*([\d.]+)([KMBkmbillion]*)/i);
+  if (!m) return null;
+  const cur = m[1].toUpperCase();
+  let val = parseFloat(m[2]);
+  const suf = m[3].toUpperCase();
+  if (suf === 'K') val *= 1e3;
+  else if (suf === 'M') val *= 1e6;
+  else if (suf === 'B') val *= 1e9;
+  return { cur, val };
+}
+function formatAmount(val, cur) {
+  if (val >= 1e9) return cur + ' ' + (val/1e9).toFixed(1).replace(/\.0$/,'') + 'B';
+  if (val >= 1e6) return cur + ' ' + (val/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (val >= 1e3) return cur + ' ' + (val/1e3).toFixed(0) + 'K';
+  return cur + ' ' + val.toFixed(0);
+}
+function sumAmounts(deals) {
+  const byCur = {};
+  deals.forEach(d => {
+    const p = parseAmount(d.amount);
+    if (!p) return;
+    byCur[p.cur] = (byCur[p.cur]||0) + p.val;
+  });
+  return Object.entries(byCur).map(([c,v]) => formatAmount(v,c)).join(' + ') || null;
+}
+
+function stageClass(s) {
+  if (!s) return 'pill-qsl';
+  const l = s.toLowerCase();
+  if (l.includes('won') || l.includes('verbal')) return 'pill-won';
+  if (l.includes('proposal')) return 'pill-prop';
+  if (l.includes('demo')) return 'pill-demo';
+  if (l.includes('nego') || l.includes('contract') || l.includes('review')) return 'pill-nego';
+  return 'pill-qsl';
+}
+function stageTagStyle(s) {
+  if (!s) return 'background:#eeebf8;color:#6a4fb8;';
+  const l = s.toLowerCase();
+  if (l.includes('won') || l.includes('verbal')) return 'background:#e8f5ee;color:#1e7a3a;';
+  if (l.includes('proposal')) return 'background:#e6eef8;color:#1a5fa8;';
+  if (l.includes('demo')) return 'background:#fdf3e3;color:#b8720a;';
+  if (l.includes('nego') || l.includes('contract') || l.includes('review')) return 'background:#e8f5ee;color:#1e7a3a;';
+  return 'background:#eeebf8;color:#6a4fb8;';
+}
+function stageCounts(deals) {
+  const c = {};
+  deals.forEach(d => { if (d.stage) c[d.stage] = (c[d.stage]||0)+1; });
+  return c;
+}
+
+/* ══════════════════════════════════════════
+   DEAL REGISTRY — avoids inline JSON in onclick
+══════════════════════════════════════════ */
+const _dealRegistry = {};
+let _dealRegIdx = 0;
+function registerDeal(d) {
+  const key = 'deal_' + (_dealRegIdx++);
+  _dealRegistry[key] = d;
+  return key;
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE — LIST VIEW
+══════════════════════════════════════════ */
+function renderPipelineList(deals, containerId, market) {
+  const counts = stageCounts(deals);
+  // Build per-stage deal lists for amount summing
+  const byStage = {};
+  deals.forEach(d => { if (d.stage) { if (!byStage[d.stage]) byStage[d.stage] = []; byStage[d.stage].push(d); }});
+  const pills = Object.entries(counts).map(([s,n]) => {
+    const sum = sumAmounts(byStage[s]||[]);
+    const label = s.replace('Qualified (QSL)','QSL');
+    return `<span class="pill ${stageClass(s)}">${label} ${n}${sum ? ' <span style="opacity:.7;font-weight:400;">'+sum+'</span>' : ''}</span>`;
+  }).join('');
+  // Total across all deals
+  const total = sumAmounts(deals);
+  const totalHtml = total ? `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px;text-align:right;">Total: <strong style="color:var(--text2);">${total}</strong></div>` : '';
+  const rows = deals.slice(0,12).map(d => {
+    const key = registerDeal(d);
+    return `
+    <div class="deal-row clickable" data-deal="${key}" onclick="openDealByKey(this.dataset.deal)">
+      <span class="deal-name">${(d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ')}</span>
+      <div class="deal-right">
+        ${d.amount ? `<span class="deal-amt">${d.amount}</span>` : ''}
+        <span class="stage-tag" style="${stageTagStyle(d.stage)}">${(d.stage||'').replace('Qualified (QSL)','QSL')}</span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="pipe-pills">${pills}</div>${totalHtml}${rows}`;
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE — TIMELINE VIEW
+══════════════════════════════════════════ */
+function parseCloseMonth(closeDate) {
+  // Accepts "2026-Q2", "2026-05", "May 2026", "2026/05", "5/2026", ISO date, etc.
+  if (!closeDate) return null;
+  const s = String(closeDate).trim();
+  // Q notation: "2026-Q2" or "Q2 2026"
+  const qm = s.match(/(\d{4})[^\d]?[Qq](\d)/)||s.match(/[Qq](\d)[^\d]?(\d{4})/);
+  if (qm) {
+    const year = qm[1]?.length===4 ? +qm[1] : +qm[2];
+    const q    = qm[1]?.length===4 ? +qm[2] : +qm[1];
+    return { year, q, month: null };
+  }
+  // ISO-ish: "2026-05" or "2026-05-15" or "2026/05"
+  const iso = s.match(/(\d{4})[-\/](\d{1,2})/);
+  if (iso) {
+    const year = +iso[1], month = +iso[2];
+    const q = Math.ceil(month/3);
+    return { year, q, month };
+  }
+  // "May 2026" or "2026 May"
+  const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const ml = s.toLowerCase();
+  for (let i=0;i<12;i++) {
+    if (ml.includes(MONTHS[i])) {
+      const ym = s.match(/\d{4}/);
+      if (ym) { const year=+ym[0], month=i+1, q=Math.ceil(month/3); return {year,q,month}; }
+    }
+  }
+  return null;
+}
+const MONTH_NAMES_ZH = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const MONTH_NAMES_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function monthName(m) { return LANG==='zh' ? MONTH_NAMES_ZH[m-1] : MONTH_NAMES_EN[m-1]; }
+
+function renderPipelineTimeline(deals) {
+  // Group by quarter → month
+  const byQ = {};
+  const noDate = [];
+  deals.forEach(d => {
+    const cm = parseCloseMonth(d.close_date);
+    if (!cm) { noDate.push(d); return; }
+    const qk = `${cm.year}-Q${cm.q}`;
+    if (!byQ[qk]) byQ[qk] = { year: cm.year, q: cm.q, months: {} };
+    const mk = cm.month || (cm.q * 3); // fallback to last month of quarter
+    if (!byQ[qk].months[mk]) byQ[qk].months[mk] = [];
+    byQ[qk].months[mk].push({ d, cm });
+  });
+
+  const sortedQs = Object.keys(byQ).sort();
+  let html = '';
+
+  sortedQs.forEach(qk => {
+    const { year, q, months } = byQ[qk];
+    html += `<div class="timeline-quarter">
+      <div class="timeline-q-hd">${t('q_label', q)} ${year}</div>`;
+    const sortedMs = Object.keys(months).map(Number).sort((a,b)=>a-b);
+    sortedMs.forEach(mk => {
+      const monthDeals = months[mk].map(({d})=>d);
+      const monthSum = sumAmounts(monthDeals);
+      html += `<div class="timeline-month">
+        <div class="timeline-month-hd">${monthName(mk)}${monthSum ? `<span style="font-family:var(--mono);font-size:10px;font-weight:400;color:var(--text3);margin-left:8px;">${monthSum}</span>` : ''}</div>`;
+      monthDeals.forEach(d => {
+        const key = registerDeal(d);
+        html += `<div class="deal-row clickable" data-deal="${key}" onclick="openDealByKey(this.dataset.deal)">
+          <span class="deal-name">${(d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ')}</span>
+          <div class="deal-right">
+            ${d.amount ? `<span class="deal-amt">${d.amount}</span>` : ''}
+            <span class="stage-tag" style="${stageTagStyle(d.stage)}">${(d.stage||'').replace('Qualified (QSL)','QSL')}</span>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+
+  if (noDate.length) {
+    html += `<div class="timeline-quarter">
+      <div class="timeline-q-hd">${t('no_close_date')}</div>`;
+    noDate.forEach(d => {
+      const key = registerDeal(d);
+      html += `<div class="deal-row clickable" data-deal="${key}" onclick="openDealByKey(this.dataset.deal)">
+        <span class="deal-name">${(d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ')}</span>
+        <div class="deal-right">
+          ${d.amount ? `<span class="deal-amt">${d.amount}</span>` : ''}
+          <span class="stage-tag" style="${stageTagStyle(d.stage)}">${(d.stage||'').replace('Qualified (QSL)','QSL')}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  return html || `<div class="empty">${t('no_deals')}</div>`;
+}
+
+function setPipeMode(market, mode) {
+  pipeMode[market] = mode;
+  const id = market.toLowerCase() + '-pipeline';
+  const deals = (_lastData?.pipeline?.[market])||[];
+  renderPipelineInto(deals, id, market);
+  // update tab active state
+  ['list','timeline'].forEach(m => {
+    const btn = document.getElementById(`ptab-${market}-${m}`);
+    if (btn) btn.classList.toggle('active', m === mode);
+  });
+}
+
+function renderPipelineInto(deals, containerId, market) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!deals?.length) { el.innerHTML = `<div class="empty">${t('no_deals')}</div>`; return; }
+  const toggleHtml = `<div class="pipe-view-toggle">
+    <span class="pipe-tab${pipeMode[market]==='list'?' active':''}" id="ptab-${market}-list" onclick="setPipeMode('${market}','list')">${t('list_view')}</span>
+    <span class="pipe-tab${pipeMode[market]==='timeline'?' active':''}" id="ptab-${market}-timeline" onclick="setPipeMode('${market}','timeline')">${t('timeline_view')}</span>
+  </div>`;
+  const body = pipeMode[market]==='timeline'
+    ? renderPipelineTimeline(deals)
+    : renderPipelineList(deals, containerId, market);
+  el.innerHTML = toggleHtml + body;
+}
+
+/* ══════════════════════════════════════════
+   DEAL DETAIL PANEL
+══════════════════════════════════════════ */
+function openDealPanel(d) {
+  if (!d) return;
+  document.getElementById('dp-name').textContent =
+    (d.name||'').replace(/^(MY_|ID_|TH_)/,'').replace(/_/g,' ');
+
+  const meta = [
+    [t('dp_stage'),  d.stage ? `<span class="stage-tag" style="${stageTagStyle(d.stage)}">${d.stage}</span>` : '—'],
+    [t('dp_amount'), d.amount ? `<span style="font-family:var(--mono);font-weight:500;">${d.amount}</span>` : '—'],
+    [t('dp_close'),  d.close_date || t('dp_no_date')],
+    [t('dp_owner'),  d.owner || '—'],
+    [t('dp_account'),d.account || '—'],
+    [t('dp_industry'),d.industry || '—'],
+  ];
+  document.getElementById('dp-meta').innerHTML = meta.map(([l,v]) =>
+    `<div class="deal-meta-item"><div class="deal-meta-lbl">${l}</div><div class="deal-meta-val">${v}</div></div>`
+  ).join('');
+
+  const noteEl = document.getElementById('dp-note');
+  if (d.note) { noteEl.textContent = L(d.note); noteEl.style.display = ''; }
+  else noteEl.style.display = 'none';
+
+  // Account bio from _accountDB
+  const bioEl = document.getElementById('dp-bio');
+  const acctInfo = lookupAccount(d.account);
+  if (acctInfo) {
+    const bioText = L(acctInfo.bio || acctInfo);
+    bioEl.textContent = bioText;
+    bioEl.style.display = bioText ? '' : 'none';
+  } else {
+    bioEl.style.display = 'none';
+  }
+
+  const histEl = document.getElementById('dp-history');
+  const histLbl = document.getElementById('dp-hist-lbl');
+  const histRows = document.getElementById('dp-hist-rows');
+  histLbl.textContent = t('dp_history');
+  if (d.history?.length) {
+    histRows.innerHTML = d.history.map(h =>
+      `<div class="deal-hist-row"><div class="deal-hist-date">${h.date||'—'}</div><div>${L(h.desc)}</div></div>`
+    ).join('');
+    histEl.style.display = '';
+  } else if (d.account) {
+    histRows.innerHTML = `<div style="font-size:12px;color:var(--text3);padding:6px 0;">${t('dp_hist_none')}</div>`;
+    histEl.style.display = '';
+  } else {
+    histEl.style.display = 'none';
+  }
+
+  document.getElementById('deal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function openDealByKey(key) {
+  const d = _dealRegistry[key];
+  if (!d) return;
+  openDealPanel(d);
+}
+function closeDealPanel(e) {
+  if (e && e.target !== document.getElementById('deal-overlay')) return;
+  document.getElementById('deal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════════
+   SLACK
+══════════════════════════════════════════ */
+function renderSlack(msgs, id) {
+  if (!msgs?.length) { document.getElementById(id).innerHTML = `<div class="empty">${t('no_msgs')}</div>`; return; }
+  const active = msgs.filter(m => !m.done);
+  const done   = msgs.filter(m => m.done);
+  const mkMsg  = m => `
+    <div class="slack-msg${m.done?' done':''}">
+      <div class="slack-text">${L(m.text).slice(0,180)}${L(m.text).length>180?'…':''}</div>
+      <div class="slack-time">${m.time||''}</div>
+    </div>`;
+  let html = active.slice(0,5).map(mkMsg).join('');
+  if (done.length) {
+    html += `<div class="slack-section-label">${t('done_label')}</div>`;
+    html += done.slice(0,3).map(mkMsg).join('');
+  }
+  document.getElementById(id).innerHTML = html;
+}
+
+/* ══════════════════════════════════════════
+   AI INSIGHTS
+══════════════════════════════════════════ */
+function renderInsight(insight, bodyId, cardId) {
+  const card = document.getElementById(cardId);
+  const body = document.getElementById(bodyId);
+  if (!body || !card) return;
+  // Always show the card so pipeline doesn't stretch to full width
+  card.style.display = '';
+  if (!insight) {
+    body.innerHTML = `<div class="empty" style="color:var(--text3);font-size:11px;">${LANG==='zh'?'本週無 AI 建議（JSON 未包含 ai_insights）':'No AI insights this week (ai_insights not in JSON)'}</div>`;
+    return;
+  }
+  const items = Array.isArray(insight) ? insight : (insight.items || []);
+  if (!items.length) {
+    body.innerHTML = `<div class="empty" style="color:var(--text3);font-size:11px;">${LANG==='zh'?'本週無 AI 建議':'No AI insights this week'}</div>`;
+    return;
+  }
+  const tagMap = {
+    urgent: '<span class="insight-tag tag-urgent">緊急</span>',
+    focus:  '<span class="insight-tag tag-focus">重點</span>',
+    watch:  '<span class="insight-tag tag-watch">留意</span>',
+    ok:     '<span class="insight-tag tag-ok">穩定</span>',
+  };
+  const tagMapEn = {
+    urgent: '<span class="insight-tag tag-urgent">URGENT</span>',
+    focus:  '<span class="insight-tag tag-focus">FOCUS</span>',
+    watch:  '<span class="insight-tag tag-watch">WATCH</span>',
+    ok:     '<span class="insight-tag tag-ok">OK</span>',
+  };
+  const iconMap = { urgent:'🚨', focus:'🎯', watch:'👀', ok:'✅', default:'💡' };
+  const tmap = LANG === 'zh' ? tagMap : tagMapEn;
+  body.innerHTML = '<div class="insight-body">' + items.map(item => {
+    const type = item.type || 'default';
+    const icon = iconMap[type] || iconMap.default;
+    const tag = tmap[type] || '';
+    const text = L(item.text || item);
+    return `<div class="insight-item"><span class="insight-icon">${icon}</span><span class="insight-text">${tag}${text}</span></div>`;
+  }).join('') + '</div>';
+}
+
+/* ══════════════════════════════════════════
+   PIPELINE OVERVIEW
+══════════════════════════════════════════ */
+let _overviewOpen = true;
+function toggleOverview() {
+  _overviewOpen = !_overviewOpen;
+  document.getElementById('pipe-overview-body').style.display = _overviewOpen ? '' : 'none';
+  document.getElementById('overview-chevron').style.transform = _overviewOpen ? '' : 'rotate(180deg)';
+}
+
+function renderOverview(pipeline) {
+  const el = document.getElementById('pipe-overview-table');
+  if (!el) return;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const markets = ['MY','ID','TH'];
+  const labels = {MY:'🇲🇾 MY', ID:'🇮🇩 ID', TH:'🇹🇭 TH'};
+
+  // Global Sales Layout: Proposal Sent and above
+  const HIGH_STAGES = ['proposal sent','negotiation / review','verbal committed','contract send','closed won'];
+
+  // NTD conversion rates
+  const toNTD = (num, upper) => {
+    if (/IDR/.test(upper)) return num / 527;
+    if (/MYR/.test(upper)) return num * 7.96;
+    if (/THB/.test(upper)) return num * 0.88;
+    return num; // already TWD/NTD
+  };
+
+  // Build month→market→total map from pipeline deals (high stage only)
+  const grid = {};
+  markets.forEach(m => { grid[m] = {}; months.forEach(mo => { grid[m][mo] = 0; }); });
+
+  markets.forEach(mk => {
+    const deals = (pipeline||{})[mk] || [];
+    deals.forEach(d => {
+      if (!d.close_date || !d.amount) return;
+      // Filter: Proposal Sent and above (Global Sales Layout order)
+      const stageKey = (d.stage||'').toLowerCase().trim();
+      if (!HIGH_STAGES.includes(stageKey)) return;
+
+      // Parse amount
+      const upper = String(d.amount).toUpperCase();
+      const raw = String(d.amount).replace(/[^0-9.]/g,'');
+      let num = parseFloat(raw) || 0;
+      if (/\dB\b/.test(upper)) num *= 1000000000;
+      else if (/\dM\b/.test(upper)) {
+        if (/IDR/.test(upper)) num *= 1000000;
+        else if (/THB/.test(upper)) num *= 1000000;
+        else if (/MYR/.test(upper)) num *= 1000000;
+        else num *= 1000000;
+      } else if (/\dK\b/.test(upper)) num *= 1000;
+
+      const ntd = toNTD(num, upper);
+
+      // Map close_date → month label
+      const cd = String(d.close_date);
+      let mo = null;
+      if (/Q1/i.test(cd)) mo = 'Mar';
+      else if (/Q2/i.test(cd)) mo = 'Jun';
+      else if (/Q3/i.test(cd)) mo = 'Sep';
+      else if (/Q4/i.test(cd)) mo = 'Dec';
+      else {
+        const m2 = cd.match(/\d{4}-(\d{2})/);
+        if (m2) mo = months[parseInt(m2[1])-1];
+        else mo = months.find(m => cd.includes(m)) || null;
+      }
+      if (mo && grid[mk][mo] !== undefined) grid[mk][mo] += ntd;
+    });
+  });
+
+  // Format helper
+  const fmt = v => {
+    if (!v) return '<span style="color:var(--text3);">—</span>';
+    if (v >= 1000000) return `<span style="color:var(--green-accent,#22c55e);font-weight:600;">${(v/1000000).toFixed(1)}M</span>`;
+    if (v >= 1000) return `${(v/1000).toFixed(0)}K`;
+    return Math.round(v).toLocaleString();
+  };
+
+  // Totals
+  const rowTotal = mk => Object.values(grid[mk]).reduce((a,b)=>a+b,0);
+  const colTotal = mo => markets.reduce((a,mk)=>a+grid[mk][mo],0);
+  const grandTotal = markets.reduce((a,mk)=>a+rowTotal(mk),0);
+
+  const thStyle = 'padding:5px 8px;font-size:10px;color:var(--text3);font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border);';
+  const tdStyle = 'padding:5px 8px;font-size:11px;text-align:right;white-space:nowrap;';
+  const tdLbl  = 'padding:5px 8px;font-size:11px;font-weight:600;white-space:nowrap;';
+
+  let html = `<div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${LANG==='zh'?'Proposal Sent 以上階段（Global Sales Layout）· 單位：NTD 估算（IDR÷527 / MYR×7.96 / THB×0.88）':'Proposal Sent and above (Global Sales Layout) · Unit: NTD est. (IDR÷527 / MYR×7.96 / THB×0.88)'}</div>`;
+  html += `<table style="width:100%;border-collapse:collapse;min-width:760px;">`;
+  html += `<tr><th style="${thStyle}text-align:left;">${LANG==='zh'?'市場':'Market'}</th>`;
+  months.forEach(m => { html += `<th style="${thStyle}">${m}</th>`; });
+  html += `<th style="${thStyle}color:var(--fg);">${LANG==='zh'?'合計':'Total'}</th></tr>`;
+
+  const dotMap = {MY:'dot-my', ID:'dot-id', TH:'dot-th'};
+  markets.forEach(mk => {
+    const hasData = rowTotal(mk) > 0;
+    html += `<tr style="border-top:1px solid var(--border);">`;
+    html += `<td style="${tdLbl}"><span class="mkt-dot ${dotMap[mk]}" style="display:inline-block;"></span>${labels[mk]}</td>`;
+    months.forEach(m => { html += `<td style="${tdStyle}">${fmt(grid[mk][m])}</td>`; });
+    html += `<td style="${tdStyle}font-weight:700;">${hasData ? fmt(rowTotal(mk)) : '<span style="color:var(--text3);">—</span>'}</td>`;
+    html += `</tr>`;
+  });
+
+  // SEA Total row
+  html += `<tr style="border-top:2px solid var(--border);background:var(--bg2,rgba(255,255,255,.04));">`;
+  html += `<td style="${tdLbl}color:var(--fg);">🌏 SEA</td>`;
+  months.forEach(m => { html += `<td style="${tdStyle}font-weight:600;">${fmt(colTotal(m))}</td>`; });
+  html += `<td style="${tdStyle}font-weight:700;color:var(--accent);">${fmt(grandTotal)}</td>`;
+  html += `</tr></table>`;
+
+  el.innerHTML = html;
+}
+function renderXero(invoices, id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!invoices?.length) { el.innerHTML = `<div class="empty" style="color:var(--text3);">—</div>`; return; }
+  // Sort by due date
+  const sorted = [...invoices].sort((a,b) => (a.due||'').localeCompare(b.due||''));
+  el.innerHTML = sorted.map(inv => {
+    const overdue = inv.overdue;
+    const cls = overdue ? 'ar-urgent' : 'ar-warn';
+    return `<div class="ar-row">
+      <span class="ar-client" style="font-size:11px;">${inv.contact}</span>
+      <div class="ar-right">
+        <span class="ar-amt">${inv.amount}</span>
+        <span class="ar-status ${cls}" style="font-size:9px;">${inv.due||'—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderAR(items, id) {
+  if (!items?.length) { document.getElementById(id).innerHTML = `<div class="empty" style="color:#1e7a3a;">${t('cleared')}</div>`; return; }
+  document.getElementById(id).innerHTML = items.map(i => {
+    const isDone = !!i.done;
+    const statusStr = L(i.status);
+    const cls = isDone ? '' : statusStr.includes('已付款') || statusStr.toLowerCase().includes('paid') ? 'ar-ok' : i.urgent ? 'ar-urgent' : 'ar-warn';
+    return `<div class="ar-row${isDone?' done':''}">
+      <span class="ar-client">${L(i.client)}</span>
+      <div class="ar-right">
+        <span class="ar-amt">${i.amount||''}</span>
+        <span class="ar-status ${cls}">${statusStr}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   CALENDAR / ACTIONS / KPI
+══════════════════════════════════════════ */
+function renderCal(events, id) {
+  if (!events?.length) { document.getElementById(id).innerHTML = `<div class="empty">${t('no_events')}</div>`; return; }
+  document.getElementById(id).innerHTML = events.slice(0,10).map(e => `
+    <div class="cal-row">
+      <div class="cal-time">${e.date||''}<br>${e.time||''}</div>
+      <div><div class="cal-title">${L(e.title)}</div>${e.location?`<div class="cal-loc">${L(e.location)}</div>`:''}</div>
+    </div>`).join('');
+}
+function renderActions(items, id) {
+  if (!items?.length) { document.getElementById(id).innerHTML = `<div class="empty">${t('no_actions')}</div>`; return; }
+  document.getElementById(id).innerHTML = items.map(i => {
+    const dc = i.priority==='high'?'dot-high':i.priority==='medium'?'dot-medium':'dot-low';
+    return `<div class="action-card">
+      <div class="action-dot ${dc}"></div>
+      <div><div class="action-mkt">${i.market||'ALL'}</div><div class="action-text">${L(i.item)}</div></div>
+    </div>`;
+  }).join('');
+}
+function renderKPI(kpi, week) {
+  if (!kpi) return;
+  const rate = r => { const n=parseFloat(r); return n>=80?'good':n>=50?'':'warn'; };
+  // kpi_sub: show vs string + a dim label if the vs string doesn't already say month/quarter
+  const sub = (vs, dim) => {
+    if (!vs) return dim ? `<span style="color:var(--text3);font-size:9px;">${dim}</span>` : '';
+    return `${vs}${dim ? `<br><span style="color:var(--text3);font-size:9px;">${dim}</span>` : ''}`;
+  };
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-lbl">MY + TH — KPI</div>
+      <div class="kpi-val ${rate(kpi.my_th_rate)}">${kpi.my_th_rate||'—'}</div>
+      <div class="kpi-sub">${sub(kpi.my_th_vs, kpi.my_th_dim||'')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">INDONESIA — KPI</div>
+      <div class="kpi-val ${rate(kpi.id_rate)}">${kpi.id_rate||'—'}</div>
+      <div class="kpi-sub">${sub(kpi.id_vs, kpi.id_dim||'')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">THAILAND — KPI</div>
+      <div class="kpi-val ${rate(kpi.th_rate)}">${kpi.th_rate||'—'}</div>
+      <div class="kpi-sub">${sub(kpi.th_vs, kpi.th_dim||'')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">MY — LEADS</div>
+      <div class="kpi-val">${kpi.my_leads||'—'}</div>
+      <div class="kpi-sub" style="font-size:10px;line-height:1.6;">${(kpi.my_leads_stages||[]).map(s=>`${s.stage} <b>${s.count}</b>`).join(' · ')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">ID — LEADS</div>
+      <div class="kpi-val">${kpi.id_leads||'—'}</div>
+      <div class="kpi-sub" style="font-size:10px;line-height:1.6;">${(kpi.id_leads_stages||[]).map(s=>`${s.stage} <b>${s.count}</b>`).join(' · ')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">TH — LEADS</div>
+      <div class="kpi-val">${kpi.th_leads||'—'}</div>
+      <div class="kpi-sub" style="font-size:10px;line-height:1.6;">${(kpi.th_leads_stages||[]).map(s=>`${s.stage} <b>${s.count}</b>`).join(' · ')}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-lbl">WEEK</div>
+      <div class="kpi-val" style="font-size:28px;">${week||'—'}</div>
+      <div class="kpi-sub">${L(kpi.note)||''}</div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   RENDER ALL
+══════════════════════════════════════════ */
+function renderAll(d) {
+  _lastData = d;
+  _dealRegIdx = 0;
+  Object.keys(_dealRegistry).forEach(k => delete _dealRegistry[k]);
+  // accounts come from localStorage only — not from weekly JSON
+  document.getElementById('main').style.display = '';
+  document.getElementById('week-badge').textContent = d.week||'—';
+  document.getElementById('ts').textContent = d.generated_at||'';
+  renderKPI(d.kpi, d.week);
+  const p = d.pipeline||{};
+  renderPipelineInto(p.MY||[], 'my-pipeline', 'MY');
+  renderPipelineInto(p.ID||[], 'id-pipeline', 'ID');
+  renderPipelineInto(p.TH||[], 'th-pipeline', 'TH');
+  const sl = d.slack_highlights||{};
+  renderSlack(sl.ruby||[], 'my-slack');
+  renderSlack(sl.ranti||[], 'id-slack');
+  renderSlack(sl.jinger||[], 'th-slack');
+  renderSlack(sl.leaders||[], 'leaders-content');
+  renderSlack(sl.allhands||[], 'allhands-content');
+  renderSlack(sl.my_team||[], 'my-team-content');
+  renderSlack(sl.id_team||[], 'id-team-content');
+  renderSlack(sl.line_strategy||[], 'line-strategy-content');
+  renderSlack(sl.line_ops||[], 'line-ops-content');
+  const ai = d.ai_insights||{};
+  renderInsight(ai.MY, 'my-insight', 'my-insight-card');
+  renderInsight(ai.ID, 'id-insight', 'id-insight-card');
+  renderInsight(ai.TH, 'th-insight', 'th-insight-card');
+  renderOverview(d.pipeline);
+  const ar = d.ar||{};
+  renderAR(ar.MY||[], 'ar-my');
+  renderAR(ar.ID||[], 'ar-id');
+  renderAR(ar.TH||[], 'ar-th');
+  const xero = d.xero||{};
+  renderXero(xero.MY||[], 'xero-my');
+  renderXero(xero.ID||[], 'xero-id');
+  renderCal(d.calendar||[], 'cal-content');
+  renderActions(d.action_items||[], 'action-grid');
+  const active = arr => (arr||[]).filter(x=>!x.stage?.includes('Lost')&&!x.stage?.includes('Won')).length;
+  document.getElementById('my-meta').textContent = t('active_deals', active(p.MY));
+  document.getElementById('id-meta').textContent = t('active_deals', active(p.ID));
+  document.getElementById('th-meta').textContent = t('active_deals', active(p.TH));
+}
+
+/* ══════════════════════════════════════════
+   UI ACTIONS
+══════════════════════════════════════════ */
+function togglePaste() {
+  const p = document.getElementById('paste-panel');
+  p.style.display = p.style.display==='none' ? '' : 'none';
+}
+const DASH_JSON_KEY = 'gm_dashboard_last_json';
+
+function renderFromPaste() {
+  const raw = document.getElementById('json-input').value.trim();
+  document.getElementById('parse-error').textContent = '';
+  try {
+    const d = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    localStorage.setItem(DASH_JSON_KEY, JSON.stringify(d));
+    renderAll(d);
+    document.getElementById('paste-panel').style.display = 'none';
+    showSavedBadge();
+  } catch(e) {
+    document.getElementById('parse-error').textContent = '⚠ ' + e.message.slice(0,60);
+  }
+}
+function clearPaste() {
+  document.getElementById('json-input').value = '';
+  document.getElementById('parse-error').textContent = '';
+}
+function clearSavedJson() {
+  if (!confirm('清除本地儲存的 Dashboard JSON？\n（公司庫資料不受影響）')) return;
+  localStorage.removeItem(DASH_JSON_KEY);
+  location.reload();
+}
+function showSavedBadge() {
+  const el = document.getElementById('saved-badge');
+  if (!el) return;
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 2500);
+}
+function loadSavedJson() {
+  try {
+    const raw = localStorage.getItem(DASH_JSON_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    renderAll(d);
+  } catch(e) {
+    console.warn('Failed to load saved JSON:', e);
+  }
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadAccountsFromStorage();
+  loadSavedJson();
+  buildClientMaster();
+  cmGo();
+  const ta = document.getElementById('json-input');
+  if (ta) {
+    ta.addEventListener('focus', () => document.getElementById('paste-panel').classList.add('active'));
+    ta.addEventListener('blur',  () => document.getElementById('paste-panel').classList.remove('active'));
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { document.getElementById('deal-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+  });
+});
+
+/* ══════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════ */
+function switchTab(tab) {
+  const isDash = tab === 'dashboard';
+  document.getElementById('tab-dashboard').classList.toggle('active', isDash);
+  document.getElementById('tab-clients').classList.toggle('active', !isDash);
+  // dashboard view elements
+  ['paste-panel','accounts-panel','main'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.style.display !== 'none' && isDash) {} // keep current state
+  });
+  document.getElementById('client-master').style.display = isDash ? 'none' : 'block';
+  if (isDash) {
+    document.getElementById('client-master').style.display = 'none';
+  } else {
+    // hide dashboard panels when on client tab
+    document.getElementById('paste-panel').style.display = 'none';
+    document.getElementById('accounts-panel').style.display = 'none';
+    document.getElementById('client-master').style.display = 'block';
+  }
+}
+
+/* ══════════════════════════════════════════
+   CLIENT MASTER DATA
+══════════════════════════════════════════ */
+const CM_CLIENTS = [
+  // ── MALAYSIA ──
+  {mkt:'MY',name:'A Cell Global',stage:'Qualified (QSL)',prob:'10%',ar:null,svc:'KOL/KOC + Ads',owner:'jiajia khoo',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-15',end:'2026-08-15',note:'KOL + TikTok streaming; meeting 5 Jun',profile:'A Cell Global 是活躍於 TikTok 及 Instagram 的美容保健品牌，主要銷售細胞修復保健補充品。透過 KOL 合作與 TikTok 直播帶貨銷售推廣，目標客群以注重抗老化需求的 30–55 歲消費者為主。Tagtoo 洽談 XHS KOL 及 TikTok 串流合作。'},
+  {mkt:'MY',name:'Adelais (AU Fashion Group)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Ruby Teng',gcm:'MYR 373,920',crm:'MYR 420,000',months:'Jan–Jun',inv:'Open | PAC',start:'2026-01-01',end:'2026-12-31',note:'Full year Google & FB; campaign running',profile:'AU Fashion Group 旗下馬來西亞女性內衣品牌，深耕 Google 與 Facebook 廣告。Tagtoo 負責全年廣告管理，是 MY 重要長期客戶。'},
+  {mkt:'MY',name:'ASUS Malaysia',stage:'Demo Meeting',prob:'30%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'MYR 34,954',crm:'MYR 20,000',months:'Jan/Feb/May',inv:'—',start:'2026-08-01',end:'2026-09-30',note:'Planning Q3 XHS KOC campaign',profile:'全球電腦硬體品牌，在馬來西亞透過 Asustek Computer Malaysia 運營。Tagtoo 協助規劃 XHS KOC 行銷，針對馬來西亞華人消費者。'},
+  {mkt:'MY',name:'Atas Frozen',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Ads',owner:'jiajia khoo',gcm:'MYR 2,850',crm:'MYR 1,000',months:'Jan/May/Jun',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'2 TikTok KOC posts',profile:'馬來西亞精品冷凍食品品牌，定位中高收入家庭市場。Tagtoo 執行 TikTok KOC 口碑行銷。'},
+  {mkt:'MY',name:'Berjaya Times Square',stage:'Proposal Sent',prob:'30%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'—',crm:'MYR 15,000',months:'—',inv:'—',start:'2026-08-01',end:'2026-09-30',note:'XHS KOC for theme park; management reviewing',profile:'吉隆坡最具規模的綜合購物商場之一，積極透過 XHS 擴大華人旅客來客量。Tagtoo 規劃 XHS KOC 種草行銷。'},
+  {mkt:'MY',name:'Celynda (Modenza)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 30,000',crm:'MYR 54,000',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-07-31',note:'Meta + TikTok ads running',profile:'馬來西亞本地女性內衣與泳裝品牌，主打時尚設計感與親民價格。Tagtoo 負責 Meta 及 TikTok 廣告投放。'},
+  {mkt:'MY',name:'Cheongdam Almas',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Social',owner:'jiajia khoo',gcm:'MYR 26,474',crm:'MYR 43,000',months:'Jan–Jun',inv:'Open | PAC',start:'2025-09-01',end:'2026-12-31',note:'Ads + XHS KOC; renew client',profile:'韓系醫美診所品牌，主打高品質韓系醫美體驗。Tagtoo 負責 XHS KOC 種草及 Google 廣告。'},
+  {mkt:'MY',name:'Cinnamon Group',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'—',crm:'MYR 7,524',months:'—',inv:'Paid | PIA',start:'2026-03-01',end:'2027-05-26',note:'XHS account management',profile:'馬來西亞餐飲集團，旗下擁有多個風格各異的餐廳品牌。Tagtoo 協助 XHS 帳號驗證與社群內容管理。'},
+  {mkt:'MY',name:'DawnBridge',stage:'Proposal Sent',prob:'10%',ar:null,svc:'Social/Content',owner:'jiajia khoo',gcm:'—',crm:'MYR 8,000',months:'—',inv:'—',start:'2026-07-01',end:'2026-08-31',note:'SMM + ads; client reviewing',profile:'馬來西亞 SME，探索社群媒體管理與廣告投放的外包需求。Tagtoo 協助建立廣告投放基礎架構。'},
+  {mkt:'MY',name:'Forklift4s / NOGAP Creative',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 36,000',crm:'MYR 130,236',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Google ads Jan-Dec; IO renewed',profile:'馬來西亞工業叉車租賃與銷售服務商，由 NOGAP CREATIVE 負責行銷。Tagtoo 負責全年 Google 廣告管理。'},
+  {mkt:'MY',name:'Hanshin Hankyu',stage:'Proposal Sent',prob:'10%',ar:null,svc:'Ads Management',owner:'jiajia khoo',gcm:'—',crm:'MYR 30,000',months:'—',inv:'—',start:'2026-08-01',end:'2026-12-31',note:'Full funnel marketing proposal; VPON group briefed',profile:'日本知名百貨零售集團，積極向東南亞市場擴展。Tagtoo 協助透過 Full-Funnel 數位廣告觸及東南亞華人高消費族群。'},
+  {mkt:'MY',name:'Herbal Farmer (BHH Products)',stage:'Closed Won',prob:'100%',ar:'⚠️ AR ~MYR 200K+ on repayment plan',svc:'KOL/KOC',owner:'jiajia khoo',gcm:'MYR 38,874',crm:'MYR 38,124',months:'Jan/Feb/Mar/Jun',inv:'Open | PAC',start:'2026-06-15',end:'2026-07-31',note:'⚠️ AR ~MYR 200K+ repayment plan; KOC June',profile:'馬來西亞本土草本美容與保健品牌，由 BHH Products Sdn Bhd 營運。⚠️ 目前 AR 約 MYR 200K+ 執行分期還款計畫，需密切追蹤。'},
+  {mkt:'MY',name:'IEM Skincare',stage:'Demo Meeting',prob:'10%',ar:null,svc:'Ads Management',owner:'jiajia khoo',gcm:'—',crm:'MYR 5,000',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'SG & MY performance ads; post-meeting proposal',profile:'馬來西亞美容保養品牌，主打針對東南亞氣候研發的護膚產品。Tagtoo 協助規劃 KOC 及 SG/MY performance ads。'},
+  {mkt:'MY',name:'IQI Real Estate',stage:'Proposal Sent',prob:'20%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'—',crm:'MYR 15,500',months:'—',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'Meta ads; still considering price',profile:'馬來西亞知名跨國房產代理集團，在全球超過 30 個國家設有業務。Tagtoo 協助規劃 Meta 廣告吸引潛在購房者。'},
+  {mkt:'MY',name:'JND Design Agency',stage:'Negotiation / Review',prob:'30%',ar:null,svc:'Ads Management',owner:'Ruby Teng',gcm:'—',crm:'MYR 2,000',months:'—',inv:'—',start:'2026-07-01',end:'2026-08-31',note:'Agency managing client accounts under Tagtoo',profile:'馬來西亞室內設計公司，透過白標方式協助旗下客戶管理數位廣告帳戶。Tagtoo 洽談廣告代管合作。'},
+  {mkt:'MY',name:'JannahNoe Empire',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 168,657',crm:'MYR 63,000',months:'Jan–Jun',inv:'—',start:'2026-06-01',end:'2026-08-31',note:'Meta + TikTok campaign renew Jun-Aug',profile:'馬來西亞知名穆斯林時尚品牌，主打時尚伊斯蘭女裝。Tagtoo 負責 Meta 及 TikTok 廣告管理。'},
+  {mkt:'MY',name:'Jubin BMS (1990)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads + Social',owner:'jiajia khoo',gcm:'MYR 1,800',crm:'MYR 257,550',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Google + FB full year + XHS; renew long-term client',profile:'馬來西亞知名陶瓷磁磚與建材代理商，成立超過 30 年。Tagtoo 負責 Google、Facebook 全年廣告及 XHS 帳號運營。'},
+  {mkt:'MY',name:'Kikyo (Kokoronokate)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'MYR 750',crm:'MYR 810',months:'May',inv:'—',start:'2026-05-21',end:'2027-05-21',note:'XHS account verification renewal',profile:'馬來西亞日系甜點與烘焙咖啡廳品牌，以日式麻糬、和菓子著稱。Tagtoo 提供 XHS 帳號驗證服務。'},
+  {mkt:'MY',name:'Kyo KL (Kyo Malaysia)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'MYR 34,954',crm:'MYR 810',months:'Jan/Feb/May',inv:'—',start:'2026-05-16',end:'2027-05-16',note:'XHS account verification renewal',profile:'馬來西亞吉隆坡日式餐廳與酒吧品牌，提供正宗日本料理及日式居酒屋體驗。Tagtoo 提供 XHS 帳號驗證服務。'},
+  {mkt:'MY',name:'Lovebite (LB International)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 24,000',crm:'MYR 156,000',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Full year Meta FB campaign',profile:'LB International 旗下女性內衣品牌，在 Shopee/Lazada 有穩定銷售表現。Tagtoo 負責全年 Meta 廣告管理。'},
+  {mkt:'MY',name:'MZ Clinic (KIMZO Aesthetic)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'MYR 2,500',crm:'MYR 2,500',months:'Apr',inv:'Paid | PIA',start:'2026-03-01',end:'2026-06-30',note:'XHS KOC 種草 campaign',profile:'KIMZO Aesthetic 旗下醫學美容診所。Tagtoo 協助 XHS KOC 種草行銷。'},
+  {mkt:'MY',name:"McDonald's via Nuffnang",stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Social',owner:'Fish Pang',gcm:'—',crm:'MYR 22,650',months:'—',inv:'—',start:'2026-02-10',end:'2026-05-31',note:'CNY + May local XHS KOL campaigns',profile:'透過 Nuffnang 委託 Tagtoo 執行麥當勞馬來西亞 XHS KOC 口碑行銷，針對馬來西亞華人消費者。'},
+  {mkt:'MY',name:'My Wedding Expo (KH Events)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'jiajia khoo',gcm:'MYR 6,900',crm:'MYR 6,900',months:'Jun',inv:'Paid | PIA',start:'2026-06-01',end:'2026-06-30',note:'KOC posting starts June; client paid',profile:'馬來西亞知名婚禮展覽品牌，定期舉辦婚博會。Tagtoo 執行 XHS KOC 行銷協助接觸準新人消費族群。'},
+  {mkt:'MY',name:'Myung Ga F&B',stage:'Contract Send',prob:'95%',ar:'⚠️ Contract on hold – internal issue',svc:'Ads Management',owner:'jiajia khoo',gcm:'—',crm:'MYR 3,800',months:'—',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'⚠️ Contract on hold – internal issue 28/5',profile:'馬來西亞吉隆坡韓式料理餐廳。⚠️ 合約目前因內部問題 hold 住（5/28）。'},
+  {mkt:'MY',name:'Natural Signature',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Ruby Teng',gcm:'MYR 67,200',crm:'USD 60,000',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-12-31',note:'Full year Google + FB; long-term client',profile:'馬來西亞本土天然有機美容保養品牌。Tagtoo 負責全年 Google 與 Facebook 廣告投放。'},
+  {mkt:'MY',name:'NeoLivin (Neo Notion)',stage:'Closed Won',prob:'100%',ar:'⚠️ AR MYR 94K – unresponsive',svc:'Ads Management',owner:'jiajia khoo',gcm:'MYR 247,800',crm:'MYR 210,000',months:'Jan–Jun',inv:'Open | PAC',start:'2026-06-01',end:'2026-12-31',note:'⚠️ AR MYR 94K unresponsive; renew contract 2026',profile:'馬來西亞現代室內家具品牌，由 Neo Notion Sdn Bhd 營運。⚠️ AR MYR 94K 逾期問題，需持續追蹤。'},
+  {mkt:'MY',name:'Onswork Media',stage:'Verbal Committed',prob:'90%',ar:null,svc:'Social/Content',owner:'Fish Pang',gcm:'MYR 750',crm:'MYR 3,000',months:'Mar',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'XHS ads management; back in July',profile:'馬來西亞數位媒體與設計代理商，協助客戶管理 XHS 帳號驗證與內容運營。Tagtoo 合作 XHS 廣告管理。'},
+  {mkt:'MY',name:'Riccione Furniture / Sail',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads Management',owner:'jiajia khoo',gcm:'MYR 59,654',crm:'MYR 95,000',months:'Jan–Jun',inv:'Open | PIA',start:'2026-01-01',end:'2026-12-31',note:'Main brand + Sail sub-brand; renew',profile:'馬來西亞知名義大利風格進口家具品牌，旗下同時推出副品牌 Sail。Tagtoo 同時管理兩品牌 Meta 廣告。'},
+  {mkt:'MY',name:'Sipzz Malaysia',stage:'Proposal Sent',prob:'20%',ar:null,svc:'Ads',owner:'Ruby Teng',gcm:'MYR 34,954',crm:'MYR 10,000',months:'Jan/Feb/May',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'TikTok ads proposal; no reply yet',profile:'馬來西亞手搖飲料品牌，主打個性化口感特色飲品。Tagtoo 協助規劃 TikTok 廣告活動。'},
+  {mkt:'MY',name:'Sunup Healthcare (Chicco/Tanita/Bebe Amico)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 46,400',crm:'MYR 197,000',months:'Jan–Jun',inv:'Open | PIA',start:'2026-05-01',end:'2026-12-31',note:'3 brands: Chicco Meta, Tanita, Bebe Amico all running',profile:'馬來西亞健康與嬰幼兒產品代理商，代理 Chicco、Tanita、Bebe Amico 等多個國際品牌。Tagtoo 同時管理三品牌廣告。'},
+  {mkt:'MY',name:'The Black Bow',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'jiajia khoo',gcm:'MYR 11,575',crm:'MYR 250',months:'Jan–May',inv:'—',start:'2026-06-03',end:'2026-06-30',note:'S2S renewal',profile:'馬來西亞精品時尚配件品牌，主打高質感手袋及女性配飾。Tagtoo 執行 S2S 追蹤設定。'},
+  {mkt:'MY',name:'Thermos Malaysia',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 34,954',crm:'MYR 164,000',months:'Jan/Feb/May',inv:'Open | PIA',start:'2026-05-01',end:'2026-12-31',note:'IO renew May-Dec; FB + TikTok + Google + S2S',profile:'全球真空保溫品牌，在馬來西亞具有極高品牌認知度。Tagtoo 負責 FB、TikTok、Google 多平台廣告管理及 S2S 追蹤。'},
+  {mkt:'MY',name:'UMMA (Dimensi Moda)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Fish Pang',gcm:'MYR 2,000',crm:'MYR 88,000',months:'Feb/Mar',inv:'—',start:'2026-05-01',end:'2026-12-31',note:'FB + TikTok May-Dec running',profile:'馬來西亞穆斯林時尚電商品牌，由 Dimensi Moda Sdn Bhd 營運。Tagtoo 負責 Facebook 與 TikTok 多平台廣告投放。'},
+  {mkt:'MY',name:'iQueen (AWJY Trading)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'jiajia khoo',gcm:'MYR 22,453',crm:'USD 229,600',months:'Jan–Jun',inv:'—',start:'2026-05-01',end:'2026-12-31',note:'SG + MY Google + Shopee ads; campaign running',profile:'新加坡與馬來西亞市場女性美容保健品牌。Tagtoo 負責 SG 與 MY 雙市場的 Google 及 Shopee 廣告。'},
+  {mkt:'MY',name:'佳格食品 (Quaker)',stage:'Negotiation / Review',prob:'40%',ar:null,svc:'KOL/KOC',owner:'jiajia khoo',gcm:'—',crm:'MYR 30,000',months:'—',inv:'—',start:'2026-08-01',end:'2026-10-31',note:'NDA signed 6/3; discussing KOC plan',profile:'台灣知名食品集團，PepsiCo 旗下 Quaker 品牌授權生產商。Tagtoo 探索馬來西亞市場的 KOC 及廣告投放合作。'},
+  // ── INDONESIA ──
+  {mkt:'ID',name:'Agora Hotel Japan',stage:'Proposal Sent',prob:'10%',ar:null,svc:'Ads Management',owner:'Sophie Ellen',gcm:'—',crm:'IDR 300M',months:'—',inv:'—',start:'2026-07-01',end:'2026-10-30',note:'Listing ads for 3 Tokyo hotels; US/AU/UK/TW/HK targets',profile:'日本東京精品商務酒店品牌，旗下設有 AGORA Asakusa、Ginza 及 Tsuki Tokyo 三個物件。Tagtoo 協助評估跨境 Listing Ads 可行性。'},
+  {mkt:'ID',name:'Bank Sinarmas (BSIM)',stage:'Negotiation / Review',prob:'85%',ar:'⚠️ Vendor onboarding; IDR 3.4B deal',svc:'Ads',owner:'Brian Wilson',gcm:'—',crm:'IDR 3,400M',months:'—',inv:'—',start:'2026-06-01',end:'2026-11-30',note:'⚠️ In-App Ads IDR 3.4B; vendor onboarding in progress',profile:'隸屬印尼 Sinarmas 集團的商業銀行。⚠️ Tagtoo 執行 In-App Ads 合作（IDR 3.4B），目前處於 Negotiation 階段，Vendor Onboarding 進行中。'},
+  {mkt:'ID',name:'BeautyHaul Indonesia',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Live Commerce',owner:'Brian Wilson',gcm:'—',crm:'IDR 55M',months:'—',inv:'—',start:'TBD',end:'TBD',note:'Live streaming proposal',profile:'印尼知名美妝電商平台與 KOL 整合行銷公司。Tagtoo 正在協助規劃 Live Streaming 直播電商方案。'},
+  {mkt:'ID',name:'BNI Life (via Sciodigital)',stage:'Negotiation / Review',prob:'80%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'IDR 17M',crm:'IDR 535M',months:'Feb/Mar/Apr',inv:'—',start:'2026-06-15',end:'2026-07-31',note:'KOL negotiation between brand and Sciodigital',profile:'BNI 旗下壽險子公司，透過 Sciodigital 數位代理商轉介。Tagtoo 協助執行 BNI Life 的 KOL 行銷活動。'},
+  {mkt:'ID',name:'Brother Indonesia (via Sciodigital)',stage:'Proposal Sent',prob:'50%',ar:null,svc:'Ads + Live Commerce',owner:'Grace Tobing',gcm:'—',crm:'IDR 30M',months:'—',inv:'—',start:'2026-06-29',end:'2026-07-27',note:'TikTok Live Shop proposal under review',profile:'日本 Brother Industries 在印尼推廣家用縫紉機及辦公印表機，透過 Sciodigital 轉介。Tagtoo 規劃 TikTok Live Shop 直播電商方案。'},
+  {mkt:'ID',name:'Ce Wati (愛恩國際)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sophie Ellen',gcm:'TWD 183,600',crm:'TWD 226,000',months:'Jan/Feb/Mar/May/Jun',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'Meta + TikTok cross-border ads Q1+Q2',profile:'台灣愛恩國際企業旗下跨境電商品牌，透過印尼市場的 TikTok 及 Meta 廣告推廣美容保健消費品。'},
+  {mkt:'ID',name:'Chicco Indonesia (3048)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC + Ads',owner:'Sophie Ellen',gcm:'IDR 12M',crm:'IDR 362M',months:'Jan',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'KOL + Meta CPAS Q1+Q2; Ramadan campaign',profile:'義大利知名嬰幼兒用品品牌，在印尼定位中高端母嬰品牌。Tagtoo 負責 Meta CPAS 廣告及 KOL 多季度行銷活動。'},
+  {mkt:'ID',name:'Counterpain (PT Taisho Pharmaceutical)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 100M',crm:'IDR 1,075M',months:'Jan',inv:'—',start:'2026-04-01',end:'2026-09-30',note:'Apr-May campaign done; Q3 follow-up KOL in demo stage',profile:'印尼最廣為人知的外用止痛凝膠/乳霜品牌，暢銷超過半世紀。Tagtoo 執行多個大型 KOL 行銷活動。'},
+  {mkt:'ID',name:'EUI Money (Indomoney)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sophie Ellen',gcm:'TWD 66,000',crm:'TWD 734,884',months:'Jan/Feb/Mar',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'App install ads ID/PH/VT; Q1+Q2',profile:'印尼金融科技應用程式，提供個人理財、小額貸款及數位支付功能。Tagtoo 負責印尼、菲律賓及越南市場的 App Install 廣告。'},
+  {mkt:'ID',name:'Flint Indonesia',stage:'Demo Meeting',prob:'5%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'—',crm:'IDR 30M',months:'—',inv:'—',start:'2026-06-15',end:'2026-06-30',note:'KOL demo stage',profile:'印尼新創科技公司，對 KOL 行銷服務有需求。Tagtoo 正在協助規劃 KOL 合作方案。'},
+  {mkt:'ID',name:'Flou by Pokana',stage:'Proposal Sent',prob:'50%',ar:null,svc:'Ads Management',owner:'Sophie Ellen',gcm:'IDR 19.8M',crm:'IDR 200M',months:'May/Jun',inv:'—',start:'2026-08-01',end:'2026-09-30',note:'H2 2026 campaign; delayed from H1',profile:'Pokana 旗下女性私密保養品牌。Tagtoo 已規劃 H2 2026 廣告活動提案，是 Pokana 集團擴展合作範疇的重要新品牌。'},
+  {mkt:'ID',name:'Grab Indonesia',stage:'Demo Meeting',prob:'20%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'—',crm:'IDR 50M',months:'—',inv:'—',start:'2026-05-26',end:'2026-06-15',note:'KOL for Grab For Business service',profile:'東南亞最大超級應用程式平台。Tagtoo 正在協助 Grab For Business 執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Green Parenting (TNP Maternity)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 15.8M',crm:'IDR 7M',months:'May/Jun',inv:'—',start:'2026-05-13',end:'2026-05-31',note:'Shopee CPAS campaign',profile:'PT TNP Maternity and Baby Trading 旗下環保育兒品牌。Tagtoo 協助執行 Shopee CPAS 廣告活動。'},
+  {mkt:'ID',name:'Hello Navan',stage:'Proposal Sent',prob:'5%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 12.6M',crm:'IDR 20M',months:'Apr/May/Jun',inv:'—',start:'2026-06-01',end:'2026-06-30',note:'CPAS proposal for travel app',profile:'印尼旅遊科技應用程式，提供一站式旅遊行程規劃及訂房服務。Tagtoo 協助執行 KOL 行銷及 CPAS 廣告活動。'},
+  {mkt:'ID',name:'Hoki Shop',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sophie Ellen',gcm:'TWD 1,589,280',crm:'IDR 901.7M',months:'Jan–Jun',inv:'—',start:'2026-01-01',end:'2026-06-30',note:'App install campaign Q1+Q2; multi-market',profile:'印尼本地購物比價 App。Tagtoo 負責多季度 App Install 廣告，在印尼、菲律賓、越南執行。'},
+  {mkt:'ID',name:'IVF Morula Clinic',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 11.1M',crm:'IDR 53.5M',months:'Apr/May/Jun',inv:'—',start:'2026-04-30',end:'TBD',note:'KOL campaign done; next phase KOL+Publisher in demo',profile:'印尼知名生殖醫學與試管嬰兒（IVF）醫療機構，隸屬大型醫療集團。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Indocafe',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'IDR 40M',crm:'IDR 20M',months:'May/Jun',inv:'—',start:'2026-06-08',end:'2026-07-10',note:'KOL campaign running',profile:'PT Berkat Nusantara Bersinar 代理的印尼知名即溶咖啡品牌。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Indopaket (PT INTI PAKET PRIMA)',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Social/Content',owner:'Brian Wilson',gcm:'—',crm:'IDR 380M',months:'—',inv:'—',start:'2026-07-01',end:'2027-03-01',note:'Branding campaign proposal',profile:'印尼物流快遞服務公司。Tagtoo 正在協助規劃品牌廣告活動。'},
+  {mkt:'ID',name:'Isaku / Indomaret (PT Inti Dunia Sukses)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 7.5M',crm:'IDR 20M',months:'Jan',inv:'—',start:'2025-12-01',end:'2026-01-31',note:'App install ads; completed',profile:'PT Inti Dunia Sukses 旗下 App，與 Indomaret（印尼最大便利商店連鎖）緊密合作。Tagtoo 協助執行 App Install 廣告。'},
+  {mkt:'ID',name:'JamBor (Borobudur Herbal)',stage:'Demo Meeting',prob:'20%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'—',crm:'IDR 150M',months:'—',inv:'—',start:'2026-06-22',end:'2026-07-26',note:'Ads + affiliate proposal in demo',profile:'印尼草本保健品牌，主打婆羅浮屠傳統草藥配方。Tagtoo 協助規劃 Ads 廣告與 Affiliate 聯盟行銷雙軌方案。'},
+  {mkt:'ID',name:'Kratingdaeng / Red Bull ID (Alembana)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian / Sophie',gcm:'IDR 648M',crm:'IDR 2,808M',months:'Feb',inv:'—',start:'2026-02-10',end:'2026-03-31',note:'Ramadan + IBL mega KOL campaign; completed',profile:'印尼能量飲料市場絕對龍頭品牌。Tagtoo 執行多個大型 KOL 行銷活動（Ramadan + IBL）。'},
+  {mkt:'ID',name:'Mie Gaga (Gaga Mie)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Sophie Ellen',gcm:'IDR 34.5M',crm:'IDR 46M',months:'Apr/May/Jun',inv:'—',start:'2026-04-01',end:'2026-07-31',note:'SMM campaign post-Eid; running',profile:'印尼特色即食泡麵品牌，以極辣口味著稱，善用社群媒體行銷。Tagtoo 協助執行 SMM 社群媒體管理服務。'},
+  {mkt:'ID',name:'Mooimom / Momcozy (TNP Maternity)',stage:'Closed Won',prob:'100%',ar:'⚠️ AR IDR 398.5M committed',svc:'Ads',owner:'Brian Wilson',gcm:'IDR 49.2M',crm:'IDR 335M',months:'May/Jun',inv:'Open | PIA',start:'2025-12-01',end:'2027-06-01',note:'⚠️ AR IDR 398.5M; Shopee CPAS + Meta + TikTok Shop',profile:'印尼知名孕產期服飾品牌，由 TnP Maternity 旗下經營。⚠️ 目前存在 AR IDR 398.5M 帳款問題，需積極追蹤。'},
+  {mkt:'ID',name:'Oxford University Press (OUP)',stage:'Proposal Sent',prob:'30%',ar:null,svc:'Ads Management',owner:'Sophie Ellen',gcm:'—',crm:'TWD 50,000',months:'—',inv:'—',start:'2026-10-15',end:'2026-11-15',note:'ID minor market ads proposal',profile:'全球最大大學出版社之一，在東南亞主要業務為語言學習出版品及高等教育資源。Tagtoo 同時為泰國及印尼市場提供廣告方案。'},
+  {mkt:'ID',name:'Paramex (Bintang Toedjoe)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'IDR 4M',crm:'IDR 2M',months:'May/Jun',inv:'—',start:'2026-05-18',end:'2026-05-22',note:'KOL campaign; completed',profile:'Bintang Toedjoe 旗下印尼知名止痛藥品牌，家喻戶曉的 OTC 止痛藥。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Pokana (PT Tata Global Sentosa)',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 19.8M',crm:'IDR 15M',months:'May/Jun',inv:'—',start:'2026-05-19',end:'2026-05-31',note:'Pokana + MomBaby KOL campaigns',profile:'印尼知名嬰兒紙尿布品牌，在印尼嬰幼兒紙尿布市場具有相當市佔率。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Polytron Indonesia (via Wolfgeng)',stage:'Proposal Sent',prob:'30%',ar:null,svc:'KOL/KOC',owner:'Sophie Ellen',gcm:'—',crm:'IDR 726.5M',months:'—',inv:'—',start:'2026-03-31',end:'2026-05-01',note:'KOL proposal via Wolfgeng agency',profile:'印尼本土知名消費電子品牌，透過 Wolfgeng 代理商執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Sensodyne (Haleon)',stage:'Proposal Sent',prob:'50%',ar:null,svc:'Social/Content',owner:'Grace Tobing',gcm:'—',crm:'IDR 96M',months:'—',inv:'—',start:'2026-07-06',end:'2027-07-05',note:'Content creation proposal; annual contract',profile:'Haleon 旗下全球知名抗敏感牙膏品牌。Tagtoo 協助規劃 Content Creation 內容製作服務。'},
+  {mkt:'ID',name:'Skin Evo Indonesia',stage:'Demo Meeting',prob:'30%',ar:null,svc:'Ads + Social',owner:'Brian Wilson',gcm:'IDR 156.1M',crm:'IDR 10M',months:'Jan–Jun',inv:'—',start:'TBD',end:'TBD',note:'Content creation + Google/Meta ads',profile:'印尼本土護膚品牌，主打針對東南亞熱帶氣候設計的美白、控油及防曬系列。Tagtoo 協助規劃 Content Creation 及廣告整合方案。'},
+  {mkt:'ID',name:'Spill Jakarta',stage:'Proposal Sent',prob:'50%',ar:null,svc:'KOL/KOC',owner:'Grace Tobing',gcm:'—',crm:'IDR 60M',months:'—',inv:'—',start:'2026-06-29',end:'2026-09-30',note:'KOL proposal; client reviewing',profile:'印尼雅加達 F&B 餐飲與生活風格品牌，在 Instagram 及 TikTok 上具有都市年輕族群追蹤者基礎。Tagtoo 協助執行 KOL 行銷活動。'},
+  {mkt:'ID',name:'Technogym Indonesia',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Brian Wilson',gcm:'IDR 180M',crm:'IDR 360M',months:'Jan–Jun',inv:'—',start:'2025-09-01',end:'2026-03-31',note:'Multi-platform ads; FB/Google/MS; completed',profile:'義大利頂級健身器材品牌，客戶涵蓋奧運賽場、五星飯店及高端健身中心。Tagtoo 負責多平台廣告管理。'},
+  {mkt:'ID',name:'Vinko Indonesia',stage:'Closed Won',prob:'100%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'IDR 15M',crm:'IDR 5M',months:'Apr/May/Jun',inv:'—',start:'2026-05-01',end:'2026-05-09',note:'Affiliate campaign; completed',profile:'印尼消費品品牌，透過 Affiliate 聯盟行銷模式推廣產品。Tagtoo 協助執行 Affiliate 行銷活動。'},
+  {mkt:'ID',name:'XL Satu (XL Axiata)',stage:'Closed Won',prob:'100%',ar:null,svc:'Social/Content',owner:'Sophie Ellen',gcm:'—',crm:'IDR 417.2M',months:'—',inv:'—',start:'2026-01-01',end:'2026-02-28',note:'Branding campaign; completed',profile:'印尼電信集團 XL Axiata 推出的一站式家庭數位服務方案。Tagtoo 協助執行品牌廣告活動。'},
+  {mkt:'ID',name:'Yves Rocher Indonesia',stage:'Demo Meeting',prob:'10%',ar:null,svc:'KOL/KOC',owner:'Brian Wilson',gcm:'—',crm:'IDR 120M',months:'—',inv:'—',start:'TBD',end:'TBD',note:'Affiliate marketing proposal',profile:'法國知名植物美妝品牌，以植物萃取成分為核心配方，在全球 80 多個國家設有分店。Tagtoo 協助規劃 Affiliate 聯盟行銷方案。'},
+  // ── THAILAND ──
+  {mkt:'TH',name:'B-KOOL Thailand',stage:'Qualified (QSL)',prob:'15%',ar:null,svc:'Ads',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'TBD',end:'TBD',note:'Breast milk bag; Shopee CPAS; referred by Baby Lovett',profile:'泰國本土哺乳輔助產品品牌，主打儲奶袋與哺乳媽媽相關用品。透過 Baby Lovett CEO 轉介給 Tagtoo，評估 Shopee CPAS 廣告方案。'},
+  {mkt:'TH',name:'Baby Lovett Thailand (Asawaroj)',stage:'Closed Won',prob:'100%',ar:null,svc:'Ads',owner:'Sam',gcm:'THB 180,008',crm:'THB 602,000',months:'Jan–Jun',inv:'Paid | PIA',start:'2026-04-01',end:'2026-12-31',note:'Contract Apr-Dec; CPAS+Google+TikTok running',profile:'泰國嬰幼兒益智玩具與教育產品代理商，由 Asawaroj Co., Ltd. 經營。Tagtoo 進入泰國市場的核心客戶，負責 Shopee CPAS、Google 及 TikTok 廣告。'},
+  {mkt:'TH',name:'Greenday Thailand',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'Waiting for client brief; event ends 30 May',profile:'泰國健康有機食品品牌，主打天然有機蔬果乾及功能性食品系列。Tagtoo 正與 Greenday 洽談廣告合作。'},
+  {mkt:'TH',name:'Oxford University Press (TH)',stage:'Qualified (QSL)',prob:'10%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'TWD 600,000',months:'—',inv:'—',start:'2026-08-01',end:'TBD',note:'Budget + KPIs not locked; takes 2 more weeks',profile:'全球最大大學出版社之一。Tagtoo 同時為泰國及印尼市場提供廣告方案，是跨市場教育品牌合作案例。'},
+  {mkt:'TH',name:'Playmobil Thailand',stage:'Qualified (QSL)',prob:'10%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'TBD',end:'TBD',note:'German toy brand; meeting 6/15 BKK; referred by Baby Lovett CEO',profile:'德國著名教育玩具品牌，在全球 130 多個國家銷售。透過 Baby Lovett CEO 轉介，計劃於曼谷進行面談。'},
+  {mkt:'TH',name:'SY Agency (Chinese Ads)',stage:'Demo Meeting',prob:'30%',ar:null,svc:'Ads Management',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'Meeting BKK 5/29; Douyin ads discussion',profile:'泰國數位行銷代理商，專注於協助品牌客戶進入中文語系市場，特別是抖音及 XHS 平台廣告投放。Tagtoo TH 首個代理商渠道合作案例。'},
+  {mkt:'TH',name:'YVIS Thailand',stage:'Demo Meeting',prob:'20%',ar:null,svc:'Social/Content',owner:'Sam',gcm:'—',crm:'—',months:'—',inv:'—',start:'2026-07-01',end:'2026-07-31',note:'Thai accessories; XHS ads interest; aligning internally',profile:'泰國飾品與配件品牌，主打時尚感強烈的輕珠寶系列。Tagtoo 協助評估 XHS 廣告投放可行性。'},
+];
+
+function cmStageColor(stage) {
+  if (stage.includes('Closed Won')) return '#276749';
+  if (stage.includes('Verbal') || stage.includes('Contract')) return '#B7791F';
+  if (stage.includes('Negotiation')) return '#B7791F';
+  if (stage.includes('Proposal')) return '#2B6CB0';
+  if (stage.includes('Demo')) return '#6B46C1';
+  return '#718096';
+}
+
+function cmBgColor(stage, hasAr) {
+  if (hasAr) return '#FFF0F0';
+  if (stage.includes('Closed Won')) return '#F0FFF4';
+  if (stage.includes('Verbal') || stage.includes('Negotiation') || stage.includes('Contract')) return '#FFFDE7';
+  if (stage.includes('Proposal')) return '#EBF8FF';
+  if (stage.includes('Demo')) return '#F5F0FF';
+  return '#FAFAFA';
+}
+
+let _cmFilter = 'all';
+function cmSf(f, btn) {
+  _cmFilter = f;
+  document.querySelectorAll('.cm-fb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cmGo();
+}
+function cmGo() {
+  const q = (document.getElementById('cm-q') || {value:''}).value.toLowerCase();
+  const cards = document.querySelectorAll('.cm-card');
+  const hdrs = document.querySelectorAll('.cm-mkt-hdr');
+  let vis = 0;
+  cards.forEach(c => {
+    const txt = c.textContent.toLowerCase();
+    const mkt = c.dataset.mkt || '';
+    const stage = c.dataset.stage || '';
+    const ar = c.dataset.ar || '';
+    let show = true;
+    if (q && !txt.includes(q)) show = false;
+    if (_cmFilter === 'MY' && mkt !== 'MY') show = false;
+    if (_cmFilter === 'ID' && mkt !== 'ID') show = false;
+    if (_cmFilter === 'TH' && mkt !== 'TH') show = false;
+    if (_cmFilter === 'won' && !stage.includes('Closed Won')) show = false;
+    if (_cmFilter === 'pipe' && !['Negotiation','Verbal','Contract','Proposal','Demo'].some(s => stage.includes(s))) show = false;
+    if (_cmFilter === 'ar' && !ar) show = false;
+    c.classList.toggle('cm-hidden', !show);
+    if (show) vis++;
+  });
+  hdrs.forEach(h => {
+    const mkt = h.dataset.mkt;
+    let next = h.nextElementSibling;
+    let hasV = false;
+    while (next && !next.classList.contains('cm-mkt-hdr')) {
+      if (!next.classList.contains('cm-hidden') && next.classList.contains('cm-card')) hasV = true;
+      next = next.nextElementSibling;
+    }
+    h.classList.toggle('cm-hidden', !hasV);
+  });
+  const st = document.getElementById('cm-stats');
+  if (st) st.textContent = `顯示 ${vis} / ${CM_CLIENTS.length} 間公司`;
+}
+
+function buildClientMaster() {
+  const container = document.getElementById('cm-list');
+  if (!container) return;
+  const byMkt = {MY: [], ID: [], TH: []};
+  CM_CLIENTS.forEach(c => (byMkt[c.mkt] || []).push(c));
+  const mktColors = {MY:'#1B5E20', ID:'#7B3F00', TH:'#1A237E'};
+  const mktLabels = {MY:'🇲🇾 Malaysia', ID:'🇮🇩 Indonesia', TH:'🇹🇭 Thailand'};
+  let html = '';
+  ['MY','ID','TH'].forEach(mkt => {
+    html += `<div class="cm-mkt-hdr" style="background:${mktColors[mkt]};" data-mkt="${mkt}">${mktLabels[mkt]}</div>`;
+    byMkt[mkt].forEach(c => {
+      const sc = cmStageColor(c.stage);
+      const bg = cmBgColor(c.stage, !!c.ar);
+      html += `<div class="cm-card" style="background:${bg};border-left:4px solid ${sc};" data-mkt="${c.mkt}" data-stage="${c.stage}" data-ar="${c.ar||''}">
+  <div class="cm-card-hd">
+    <div class="cm-acct">${c.name}</div>
+    <div class="cm-badges">
+      ${c.ar ? `<span class="cm-badge warn">⚠️ AR</span>` : ''}
+      <span class="cm-badge" style="background:${sc};">${c.stage}</span>
+      <span class="cm-badge prob">${c.prob}</span>
+    </div>
+  </div>
+  <div class="cm-profile">${c.profile}</div>
+  <div class="cm-grid">
+    <div class="cm-item"><span class="cm-lbl">服務類型</span><span class="cm-val">${c.svc}</span></div>
+    <div class="cm-item"><span class="cm-lbl">負責人</span><span class="cm-val">${c.owner}</span></div>
+    <div class="cm-item"><span class="cm-lbl">GCM預算</span><span class="cm-val">${c.gcm||'—'}</span></div>
+    <div class="cm-item"><span class="cm-lbl">CRM金額</span><span class="cm-val">${c.crm||'—'}</span></div>
+    <div class="cm-item"><span class="cm-lbl">活躍月份</span><span class="cm-val">${c.months||'—'}</span></div>
+    <div class="cm-item"><span class="cm-lbl">發票狀態</span><span class="cm-val">${c.inv||'—'}</span></div>
+    <div class="cm-item span2"><span class="cm-lbl">合作期間</span><span class="cm-val">${c.start} → ${c.end}</span></div>
+    ${c.ar ? `<div class="cm-item span2 ar-row"><span class="cm-lbl">AR / 付款</span><span class="cm-val ar">${c.ar}</span></div>` : ''}
+    <div class="cm-item span2"><span class="cm-lbl">最新備註</span><span class="cm-val notes">${c.note}</span></div>
+  </div>
+</div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+</script>
+
+<!-- CLIENT MASTER PAGE -->
+<div id="client-master">
+  <div class="cm-controls">
+    <input class="cm-search" id="cm-q" type="text" placeholder="搜尋公司名稱、服務、負責人..." oninput="cmGo()">
+    <div class="cm-filters">
+      <button class="cm-fb active" onclick="cmSf('all',this)">All <b id="cm-n-all">77</b></button>
+      <button class="cm-fb my" onclick="cmSf('MY',this)">🇲🇾 MY</button>
+      <button class="cm-fb id" onclick="cmSf('ID',this)">🇮🇩 ID</button>
+      <button class="cm-fb th" onclick="cmSf('TH',this)">🇹🇭 TH</button>
+      <button class="cm-fb won" onclick="cmSf('won',this)">✅ Won</button>
+      <button class="cm-fb pipe" onclick="cmSf('pipe',this)">🟡 Pipeline</button>
+      <button class="cm-fb ar" onclick="cmSf('ar',this)">⚠️ AR</button>
+    </div>
+  </div>
+  <div class="cm-stats" id="cm-stats">顯示 77 / 77 間公司</div>
+  <div id="cm-list"></div>
+</div>
+
+</body>
+</html>
